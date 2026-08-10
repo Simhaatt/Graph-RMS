@@ -3,7 +3,7 @@
 - `manuscript_supplied.tex` is the audited LaTeX source. With author approval,
   its duplicate Data Availability section and fictitious DOI were replaced by
   one release-safe statement naming the GitHub repository; the verified Zenodo
-  DOI must be inserted after archival.
+  DOI was inserted after verifying the published Zenodo record.
 - `references.bib` is the author-supplied bibliography. A byte-identical copy
   is also stored at the repository root so `\bibliography{references}` resolves
   when LaTeX is run from the repository root.
@@ -12,5 +12,5 @@
 - `RELEASE_NOTES_v1.0.0.md` is the proposed GitHub release text.
 
 The supplied workflow image is stored at `figures/graph.png`. The asset and
-bibliography checks pass. The source contains no fictitious DOI; add only the
-real Zenodo DOI generated for `v1.0.0`.
+bibliography checks pass. The source cites the verified `v1.0.0` archive DOI,
+`10.5281/zenodo.21876448`.

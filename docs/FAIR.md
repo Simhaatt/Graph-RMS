@@ -6,11 +6,11 @@
 - `.zenodo.json` prepares the software archive metadata.
 - `docs/RESULTS_MAP.md` maps every manuscript table and figure to a concrete
   repository artifact.
-- The planned release tag is `v1.0.0`.
+- The published release tag is `v1.0.0`.
 
-The planned repository URL and Simhaa T. T.'s verified ORCID are recorded.
-No Zenodo DOI or funding identifier is invented; add those only after the
-corresponding public records exist and have been verified.
+The repository URL, Simhaa T. T.'s verified ORCID, version DOI
+`10.5281/zenodo.21876448`, and concept DOI `10.5281/zenodo.21876447` are
+recorded from the published records. No funding identifier is invented.
 
 ## Accessible
 
@@ -42,7 +42,5 @@ third-party materials.
 ## Remaining manual FAIR tasks
 
 1. verify original-provider licences and preferred citations for all datasets;
-2. create the public GitHub repository and `v1.0.0` release;
-3. connect the release to Zenodo and publish the DOI;
-4. insert the verified DOI into the final manuscript and metadata;
-5. archive the final manuscript-linked release checksum.
+2. archive the final manuscript-linked release checksum and DOI citation;
+3. update the repository metadata only when a later verified release exists.

@@ -5,6 +5,7 @@ type: software
 version: 1.0.0
 date-released: 2026-08-10
 license: MIT
+doi: "10.5281/zenodo.21876448"
 repository-code: "https://github.com/Simhaatt/Graph-RMS"
 authors:
   - family-names: "T. T."

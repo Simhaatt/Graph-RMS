@@ -1,8 +1,8 @@
 # GitHub and Zenodo release checklist
 
 This checklist was prepared from the current official documentation on
-10 August 2026. It does not authorize publishing and no external release has
-been created.
+10 August 2026. GitHub release `v1.0.0` and its Zenodo archive have now been
+published.
 
 Official references:
 
@@ -23,8 +23,7 @@ Official references:
 - [x] Add and validate the manuscript `references.bib`.
 - [x] Remove the duplicate Data Availability section and fictitious DOI from
       the manuscript.
-- [ ] Keep the Zenodo DOI out of the submitted source until a real DOI is
-      reserved or registered.
+- [x] Replace the fictitious DOI only after the real Zenodo DOI was registered.
 - [ ] Verify the original provider, preferred citation, and terms for all nine
       third-party datasets.
 - [ ] Run `python scripts/audit_results.py` and `pytest -q`.
@@ -111,6 +110,6 @@ After a real DOI exists:
 
 ## 7. Final readiness decision
 
-The scientific evidence package is ready for author review. Public-release
-readiness remains **conditional** on creation/verification of the real GitHub
-and Zenodo records and insertion of the verified DOI into the final manuscript.
+The scientific evidence package, public GitHub release, and Zenodo archive are
+available. The verified version DOI is `10.5281/zenodo.21876448` and the
+all-versions concept DOI is `10.5281/zenodo.21876447`.

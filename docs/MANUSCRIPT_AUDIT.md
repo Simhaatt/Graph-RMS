@@ -38,8 +38,8 @@ was regenerated or altered while assembling this repository.
 
 With author approval, the duplicate Data Availability section was removed and
 the fictitious `zenodo.XXXXXXXX` DOI was deleted. The single remaining
-statement names the planned public GitHub repository. Its version-specific
-Zenodo DOI must be inserted only after public release `v1.0.0` is archived.
+statement names the public GitHub repository and the verified version-specific
+Zenodo DOI `10.5281/zenodo.21876448` for release `v1.0.0`.
 A replacement template is retained in
 `manuscript_support/DATA_CODE_AVAILABILITY.tex`.
 

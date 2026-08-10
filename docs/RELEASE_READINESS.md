@@ -28,15 +28,12 @@ Assessment date: 10 August 2026
 
 ## Author action required before public release
 
-1. Create the public GitHub repository and verify the creator metadata.
-2. Enable Zenodo integration before publishing GitHub release `v1.0.0`.
-3. Insert the real Zenodo DOI into the final manuscript after archival.
-4. Verify each original dataset provider's preferred citation and terms.
+1. Verify each original dataset provider's preferred citation and terms.
+2. Preserve the published `v1.0.0` tag and archive without rewriting them.
 
 ## Decision
 
 **Scientific reproducibility package:** ready for co-author review.  
-**Public open-source release:** ready for the GitHub/Zenodo publication steps;
-the DOI cannot be completed until Zenodo archives `v1.0.0`.  
-**Journal availability statements:** drafted, but public identifiers must be
-inserted only after real records exist.
+**Public open-source release:** published on GitHub and archived by Zenodo.  
+**Journal availability statements:** updated with the verified version DOI
+`10.5281/zenodo.21876448`.
