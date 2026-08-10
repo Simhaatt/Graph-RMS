@@ -33,7 +33,7 @@ values were checked against the stored CSV/JSON records.
 
 | Manuscript filename | Curated file | Numerical/data source | Status |
 |---|---|---|---|
-| `figures/graph.png` | `figures/graph.png` | Author-supplied workflow artwork; method equations and `configs/primary.yaml` | Present; valid 1693 x 929 RGB PNG. |
+| `figures/graph.pdf` | `figures/graph.pdf` | Author-supplied workflow artwork; method equations and `configs/primary.yaml` | Present; one-page vector PDF with embedded fonts. |
 | `figures/fig2_representative_cluster_maps.png` | `figures/fig2_representative_cluster_maps.png` | Frozen NPY partitions for KSC, HongHu, Trento; reference maps required only for regeneration | Present; copied without visual redesign from the supplied evidence figure. |
 | `figures/fig3_fragmentation.png` | `figures/fig3_fragmentation.png` | `results/supporting_results/oversegmentation.csv` | Present. |
 | `figures/fig4_sensitivity.png` | `figures/fig4_sensitivity.png` | `results/supporting_results/sensitivity_runs_raw.csv` | Present. |

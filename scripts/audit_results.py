@@ -122,8 +122,8 @@ def main() -> int:
     for filename in figures:
         if not (ROOT / "figures" / filename).exists():
             failures.append(f"missing supplied manuscript figure: {filename}")
-    if not (ROOT / "figures/graph.png").exists():
-        message = "missing supplied workflow figure: figures/graph.png"
+    if not (ROOT / "figures/graph.pdf").exists():
+        message = "missing vector workflow figure: figures/graph.pdf"
         (failures if args.strict_manuscript_assets else warnings).append(message)
     if not (ROOT / "manuscript_support/references.bib").exists():
         message = "missing supplied bibliography: manuscript_support/references.bib"

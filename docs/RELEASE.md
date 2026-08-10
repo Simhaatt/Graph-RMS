@@ -19,7 +19,7 @@ Official references:
 - [x] Replace the no-grant `LICENSE` placeholder with approved MIT text.
 - [x] Add the approved SPDX licence identifier to `CITATION.cff` and
       `.zenodo.json`.
-- [x] Preserve the supplied `figures/graph.png` workflow image.
+- [x] Preserve the publication-ready `figures/graph.pdf` workflow figure and PNG preview.
 - [x] Add and validate the manuscript `references.bib`.
 - [x] Remove the duplicate Data Availability section and fictitious DOI from
       the manuscript.

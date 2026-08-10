@@ -11,6 +11,7 @@
   explicit non-public placeholders. Replace them only with verified records.
 - `RELEASE_NOTES_v1.0.0.md` is the proposed GitHub release text.
 
-The supplied workflow image is stored at `figures/graph.png`. The asset and
-bibliography checks pass. The source cites the verified `v1.0.0` archive DOI,
+The publication workflow image is stored at `figures/graph.pdf`, with
+`figures/graph.png` retained as a preview. The asset and bibliography checks
+pass. The source cites the verified `v1.0.0` archive DOI,
 `10.5281/zenodo.21876448`.

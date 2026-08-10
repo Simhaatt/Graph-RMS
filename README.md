@@ -151,11 +151,12 @@ counts.
 3. **Rerun experiments:** requires the public datasets and appropriate compute.
    The largest profiled scene used about 14.9 GB peak allocated GPU memory.
 
-The author-supplied workflow image is preserved as `figures/graph.png`, and the
+The publication workflow figure is provided as the vector asset
+`figures/graph.pdf`; the earlier PNG is retained as a preview. The
 author-supplied bibliography is preserved as
 `manuscript_support/references.bib` (with a root copy for direct LaTeX builds).
 The audit found complete citation-key coverage, no duplicate BibTeX keys, and a
-valid 1693 x 929 PNG.
+valid vector PDF with embedded fonts.
 
 ## Citation, licence, and archival status
 

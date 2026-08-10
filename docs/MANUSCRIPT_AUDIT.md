@@ -28,8 +28,8 @@ was regenerated or altered while assembling this repository.
 
 ## Resolved supplied-asset checks
 
-- The author-supplied `figures/graph.png` is present and decodes as a valid
-  1693 x 929 RGB PNG.
+- The author-supplied `figures/graph.pdf` is present as a one-page vector PDF
+  with embedded Arial fonts; `figures/graph.png` remains available as a preview.
 - The author-supplied bibliography contains 35 unique entries. All 33 citation
   keys used by `manuscript_supplied.tex` are present; no duplicate keys or
   unbalanced braces were detected.

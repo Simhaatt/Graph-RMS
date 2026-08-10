@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FIGURES = [
+    "graph.pdf",
     "graph.png",
     "fig2_representative_cluster_maps.png",
     "fig3_fragmentation.png",
