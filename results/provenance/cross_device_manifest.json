@@ -1,0 +1,10 @@
+{
+  "status": "complete",
+  "datasets": [
+    "ksc",
+    "whu_hi_hanchuan",
+    "botswana"
+  ],
+  "comparison": "New A100 GPU partitions versus frozen CPU partitions",
+  "parameters_changed": false
+}

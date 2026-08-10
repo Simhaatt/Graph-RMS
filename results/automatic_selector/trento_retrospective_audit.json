@@ -1,0 +1,34 @@
+{
+  "dataset": "trento",
+  "role": "retrospective_locked_rule_transfer_audit",
+  "not_a_new_untouched_holdout": true,
+  "reason": "Trento reference metrics and earlier selector behaviour were known before automatic-v2 was calibrated.",
+  "v2_development_rule_sha256": "87f894b50b18edd5d1ee31d5b1b856b2a27752beb0416206523bcfc9db67bb59",
+  "selection_uses_reference_labels": false,
+  "selected": {
+    "checkpoint_T": 100,
+    "local_scale_s_T": 0.10877078771591187,
+    "gamma": 1.25,
+    "fine_radius": 0.13596348464488983,
+    "prototype_threshold_tau": 0.75,
+    "size_exponent_beta": 0.5,
+    "full_scene_regions": 67,
+    "compression": 0.8484162895927602,
+    "checkpoint_stability": 0.8726859554945002,
+    "radius_stability": 0.8845642962443852,
+    "beta_agreement": 0.9006879315492048
+  },
+  "evaluation_after_selection": {
+    "overall_accuracy": 0.6148143244853379,
+    "balanced_accuracy": 0.512234647173396,
+    "nmi": 0.7655958001539014,
+    "ari": 0.7163926491110414,
+    "ami": 0.7652142735257614,
+    "homogeneity": 0.9727601203348908,
+    "completeness": 0.6311769102434935,
+    "v_measure": 0.7655958001539013,
+    "true_classes": 6,
+    "predicted_clusters_intersecting_labelled_pixels": 39,
+    "labelled_pixels": 30214
+  }
+}

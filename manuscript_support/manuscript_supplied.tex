@@ -1,0 +1,3894 @@
+\documentclass[10pt,a4paper,fleqn]{article}
+
+\usepackage[
+a4paper,
+top=18mm,
+bottom=18mm,
+left=19mm,
+right=19mm
+]{geometry}
+
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{newtxtext,newtxmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{placeins}
+
+\usepackage[
+font=footnotesize,
+labelfont=bf,
+skip=2pt
+]{caption}
+\usepackage{subcaption}
+
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{authblk}
+\usepackage{setspace}
+\usepackage{lineno}
+\usepackage{enumitem}
+\usepackage{makecell}
+\usepackage[round,authoryear]{natbib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{titlesec}
+
+\algrenewcommand\algorithmicindent{1.3em}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+
+\urlstyle{same}
+\setstretch{1.03}
+\linenumbers
+
+\setlength{\parindent}{1.2em}
+\setlength{\parskip}{0pt}
+
+\setlength{\abovedisplayskip}{4pt plus 1pt minus 1pt}
+\setlength{\belowdisplayskip}{4pt plus 1pt minus 1pt}
+\setlength{\abovedisplayshortskip}{2pt plus 1pt}
+\setlength{\belowdisplayshortskip}{2pt plus 1pt}
+
+\setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.90}
+\renewcommand{\textfraction}{0.03}
+\renewcommand{\floatpagefraction}{0.85}
+
+\setcounter{topnumber}{5}
+\setcounter{bottomnumber}{4}
+\setcounter{totalnumber}{8}
+
+\setlist{
+topsep=2pt,
+itemsep=1pt,
+parsep=0pt,
+partopsep=0pt
+}
+
+\titlespacing*{\section}
+{0pt}{8pt plus 2pt minus 1pt}{3pt plus 1pt minus 1pt}
+
+\titlespacing*{\subsection}
+{0pt}{6pt plus 1pt minus 1pt}{2pt}
+
+\titlespacing*{\subsubsection}
+{0pt}{4pt plus 1pt minus 1pt}{1pt}
+%==============================================================================
+% Title and authors
+%==============================================================================
+\title{
+Graph-RMS: Training-Free and Class-Count-Free Spectral-Spatial Region
+Discovery in Hyperspectral Remote-Sensing Images
+}
+
+\author[1]{Simhaa T.\,T.}
+\author[2]{Steven Yves Le Moan}
+\author[3,*]{Shihabudheen K.\,V.}
+
+\affil[1]{
+Department of Electrical and Electronics Engineering,
+Sri Sivasubramaniya Nadar College of Engineering,
+Kalavakkam, Chennai 603110, Tamil Nadu, India
+}
+
+\affil[2]{
+Department of Computer Science,
+Norwegian University of Science and Technology,
+Gjøvik, Norway
+}
+
+\affil[3]{
+Department of Electrical Engineering,
+National Institute of Technology Calicut,
+NIT Campus P.O., Kozhikode 673601, Kerala, India
+}
+
+\affil[*]{
+Corresponding author: shihabudheen@nitc.ac.in
+}
+
+\date{}
+
+%==============================================================================
+% Document
+%==============================================================================
+\begin{document}
+
+\maketitle
+
+%==============================================================================
+% Abstract
+%==============================================================================
+
+\begin{abstract}
+Hyperspectral images contain detailed spectral and spatial information, but
+their analysis is difficult when labelled samples and a reliable semantic
+class count are unavailable. Graph-RMS (Graph-based Robust Mean Shift) is a
+deterministic, training-free method for discovering coherent
+spectral--spatial regions without supplying reference labels or a prescribed
+number of groups during scene processing. It constructs a reciprocal local
+graph, propagates the spectral representation through damped diffusion, forms
+fine modes, and consolidates compatible region prototypes through guarded
+endpoint selection. The primary evaluation used eight development scenes and
+Trento as an independent holdout for the frozen procedure. Graph-RMS achieved
+the highest normalised mutual information on all nine scenes in the
+five-method classical comparison. On Trento, it obtained normalised mutual
+information of 0.8495 and adjusted Rand index of 0.9447; the corresponding
+one-to-one Hungarian overall and balanced accuracies were 0.8533 and 0.6774.
+Fixed-default HDBSCAN was lower in all 36 matched scene--metric comparisons,
+while Leiden community detection on the same graph remained competitive. A
+separate automatic-selection experiment examined whether the principal
+scene-dependent settings could be chosen without target-scene labels or the
+semantic class count. Across the eight development scenes, automatic
+selection increased mean balanced accuracy, normalised mutual information,
+and adjusted Rand index, while mean overall accuracy decreased. The frozen
+automatic rule also returned a valid operating point in a retrospective
+Trento transfer test, although its agreement was lower than that of the
+primary Trento configuration. These results position Graph-RMS as a method
+for structural region discovery rather than semantic class-count estimation.
+\end{abstract}
+
+\noindent\textbf{Keywords:} hyperspectral remote sensing; unsupervised clustering; spectral--spatial analysis; graph-based region discovery; unknown class count
+
+%==============================================================================
+% 1. Introduction
+%==============================================================================
+%==============================================================================
+% 1. Introduction
+%==============================================================================
+\section{Introduction}
+\label{sec:introduction}
+
+Hyperspectral images record a reflectance spectrum at each pixel, allowing
+materials with similar visible appearance to be distinguished through their
+wavelength-dependent responses. This information has supported applications
+ranging from vegetation and crop assessment to mineral mapping, environmental
+monitoring, and urban land-cover analysis. The same spectral detail also makes
+the images difficult to examine. Hundreds of correlated bands must be interpreted
+together, scene dimensions can be large, and the spectral response of a material
+may vary with illumination, atmospheric effects, acquisition conditions, and
+within-class heterogeneity \citep{bioucasdias2013}. Spatial context helps resolve
+some of this ambiguity because nearby pixels often belong to the same physical
+region, although boundaries, mixed pixels, and small objects prevent proximity
+alone from defining a reliable partition \citep{he2018}.
+
+Supervised classification remains the usual route to thematic maps when a
+representative set of labelled pixels is available. Such labels may not exist
+during the initial examination of a newly acquired scene. Producing them
+requires field observations or expert interpretation, and the resulting
+reference map may cover only a small part of the image. The analyst may also
+lack a defensible estimate of how many distinct regions are present. This is
+particularly relevant during exploratory analysis, where the immediate aim is
+not yet to assign every pixel to a fixed land-cover legend, but to identify
+spectrally and spatially coherent areas that merit inspection. An unsupervised
+partition can therefore serve as an intermediate representation of the scene
+before semantic interpretation or targeted annotation begins.
+
+Conventional clustering provides a direct starting point for this task, but its
+assumptions do not always match the structure of hyperspectral imagery.
+Centroid-based methods usually require the number of clusters to be specified
+before fitting and can change with initialisation. They also treat pixels as
+independent observations unless spatial information is added explicitly.
+A partition obtained from spectral vectors alone may consequently contain
+isolated pixels and fragmented regions even when its cluster centres are
+well separated. Projected clustering and spectral--spatial sparse subspace
+methods reduce some of these difficulties by working in lower-dimensional
+representations or by introducing local spatial constraints
+\citep{mehta2016,zhang2016}. Their output nevertheless depends on choices such
+as representation dimension, neighbourhood construction, regularisation, and
+the prescribed number of groups.
+
+Graph representations offer a different way to organise a hyperspectral scene.
+Pixels form vertices, while weighted edges retain selected spectral or
+spectral--spatial relationships. Clustering then depends on the structure of
+local connections rather than on distance from a single global centroid
+\citep{vonluxburg2007}. This formulation is useful when a class occupies a
+non-convex region in feature space or when local continuity matters more than
+global compactness. The graph itself remains consequential: dense neighbourhoods
+can connect unrelated areas, whereas an overly restrictive graph can split a
+continuous region. Mutual-neighbour rules provide one means of retaining
+reciprocal local relationships, but low-density pixels may then become weakly
+connected or isolated. A practical graph-based method must therefore balance
+local selectivity with sufficient connectivity.
+
+Diffusion methods extend this local view by propagating information through
+successive graph transitions. The resulting representation reflects paths
+through the neighbourhood graph and can reveal relationships that are not
+captured by direct pairwise distance \citep{coifman2006}. In hyperspectral
+analysis, nonlinear diffusion has been used to combine spectral geometry with
+spatial information for clustering and active learning \citep{murphy2019}.
+More recent studies have coupled diffusion with volume-based criteria or
+superpixel regularisation to obtain coherent scene partitions
+\citep{polk2023,cui2024}. Graph contrastive methods instead learn an embedding
+before clustering, allowing spectral and spatial information to be integrated
+through a trainable representation \citep{guan2024}. Recent hyperspectral
+clustering work has extended this direction through lightweight
+self-supervised graph clustering, hypergraph contrastive learning,
+superpixel-level affinity refinement, flexible multi-anchor graphs, and
+dynamic sparse graph autoencoders
+\citep{ding2025slcgc,yao2025hypergraph,qin2025evolving,
+li2025multianchor,liang2026dsgc}. These approaches reflect the current
+emphasis on learned graph representations, spatial aggregation, and scalable
+graph construction. Graph-RMS addresses a different operating setting: it
+does not train a representation network and does not require a prescribed
+semantic class count during target-scene processing.
+
+Methods that do not require an explicit cluster count provide another relevant
+comparison. HDBSCAN extracts stable regions from a hierarchy of density-connected
+samples and can leave weakly supported observations as noise
+\citep{campello2013}. Leiden community detection partitions a graph by
+optimising community structure without receiving a target number of communities
+\citep{traag2019}. Both avoid direct specification of \(K\), but their outputs
+still depend on density, neighbourhood, resolution, and graph-construction
+choices. More importantly, a data-derived region count need not coincide with
+the number of categories in a reference map. A semantic class may contain
+several spectral or spatial regimes, while different semantic classes may
+overlap in the measured feature space. Cluster validity must therefore be
+considered in relation to the purpose of the partition rather than reduced to
+agreement with a single presumed ``true'' grouping \citep{hennig2015}.
+
+Evaluation also depends on the information available to each method. A method
+applied only to labelled pixels avoids unlabelled areas that may shape
+full-scene connectivity, while a method supplied with the reference value of
+\(K\) solves a different problem from one that must determine its partition
+without \(K\). We therefore process complete scenes, apply the reference masks
+only during scoring, and report the true-\(K\) and class-count-free comparisons
+separately.
+
+The present study examines how much spectral--spatial organisation can be
+recovered without labelled training samples, learned model parameters, or a
+prescribed semantic class count. We introduce Graph-RMS (Graph-based Robust
+Mean Shift), a deterministic procedure for full-scene region discovery. The
+method adapts the mean-shift principle to a spectral--spatial graph: pixels
+form graph nodes, reciprocal local edges encode spectral and spatial
+similarity, and damped diffusion moves each representation towards a
+graph-weighted local mean. Nearby diffused representations form fine modes,
+which are spatially refined and consolidated through reciprocal prototype
+comparisons. Minimum-degree repair and guarded endpoint selection prevent
+weak graph support and degenerate consolidation from being accepted
+uncritically. The resulting partition describes coherent spectral--spatial
+structure in the complete image rather than attempting to reconstruct a
+predetermined semantic legend.
+
+The evaluation uses nine hyperspectral scenes spanning different spatial
+scales, spectral resolutions, acquisition platforms, and levels of
+reference-label coverage. Eight scenes were available during method
+development, and their reference-based evaluations were also available while
+the procedure and operating settings were being established. The term
+``label-free'' therefore refers to the processing and endpoint selection
+performed for an individual scene, rather than to the broader development
+history of the method. Reference labels and the semantic class count are not
+inputs to graph construction, diffusion, fine-mode formation, prototype
+consolidation, or endpoint selection. Trento was excluded from development of
+the primary procedure and was processed only after that procedure had been
+fixed, providing its independent holdout evaluation. The comparison further
+separates four classical methods supplied with the reference value of \(K\)
+from HDBSCAN and Leiden, which operate without this information. HDBSCAN is
+included as a fixed-default density-based reference, while Leiden is applied
+to the same weighted graph as Graph-RMS.
+
+The primary experiments retain scene-specific diffusion, fine-mode, and
+prototype-consolidation settings. A separate automatic-selection experiment
+was therefore conducted to examine whether these operating choices could be
+made without target-scene labels or knowledge of the semantic class count. A
+single global rule was calibrated on the eight development scenes and then
+fixed. Once calibrated, the rule selected an operating point for an individual
+scene using only the hyperspectral cube and partition statistics. The same
+rule was subsequently applied to Trento as a retrospective transfer test. This
+test is reported separately from the primary Trento holdout because the
+original Trento result was already known when the automatic-selection
+experiment was designed.
+
+The contribution of this study is a graph-based Robust Mean Shift procedure
+that combines reciprocal spectral--spatial graph construction,
+minimum-degree repair, damped diffusion, fine-mode formation, and guarded
+prototype consolidation without requiring the semantic class count during
+scene processing. The study also separates structural
+region discovery from semantic class-count estimation through full-scene
+evaluation, explicit treatment of unmatched regions, and comparisons with both
+true-\(K\) and no-\(K\) methods. Component ablation, parameter sensitivity,
+fragmentation controls, perturbation tests, cross-device agreement, spatial
+bootstrap analysis, computational profiling, and the additional automatic
+operating-point experiment are used to examine where the method succeeds and
+where its behaviour changes. The intended output is a set of coherent
+spectral--spatial regions for exploratory mapping and pre-annotation analysis,
+not an estimate of the number of semantic classes.
+
+%==============================================================================
+% 3. Materials and methods
+%==============================================================================
+%==============================================================================
+% 2. Materials and methods
+%==============================================================================
+\section{Materials and methods}
+\label{sec:materials_methods}
+
+%==============================================================================
+% 2.1 Problem formulation and information-access protocol
+%==============================================================================
+\subsection{Problem formulation and information-access protocol}
+\label{subsec:problem_formulation}
+
+Let a hyperspectral image be represented by
+\(\mathbf{X}\in\mathbb{R}^{H\times W\times B}\), where \(H\) and \(W\)
+denote the spatial dimensions and \(B\) is the number of spectral bands. After
+vectorisation, the scene contains \(N=HW\) pixels. The spectral response of
+pixel \(i\) is denoted by \(\mathbf{x}_i\in\mathbb{R}^{B}\), and its spatial
+location by \(\mathbf{p}_i\in\mathbb{R}^{2}\). Graph-RMS uses the paired
+spectral and spatial observations
+
+\begin{equation}
+\mathcal{D}
+=
+\left\{
+\left(\mathbf{x}_i,\mathbf{p}_i\right)
+\right\}_{i=1}^{N}
+\end{equation}
+
+to produce a partition of the complete scene,
+
+\begin{equation}
+\widehat{\mathcal{P}}
+=
+\left\{
+\widehat{\mathcal{R}}_{1},
+\widehat{\mathcal{R}}_{2},
+\ldots,
+\widehat{\mathcal{R}}_{\widehat{M}}
+\right\},
+\end{equation}
+
+where \(\widehat{\mathcal{R}}_{m}\) is a discovered spectral--spatial region
+and \(\widehat{M}\) is the number of regions retained by the partition-based
+selection procedure. Each pixel is assigned a region index
+\(\widehat{z}_{i}\in\{1,\ldots,\widehat{M}\}\).
+
+The objective is to identify regions whose pixels are locally consistent in
+spectral response and spatial organisation. The task differs from supervised
+classification because no labelled pixels are supplied during fitting. It also
+differs from conventional clustering protocols that prescribe the number of
+output groups in advance. Graph-RMS does not receive the semantic class count
+\(K\), and \(\widehat{M}\) is not constrained to reproduce it. A single
+reference class may contain several spectrally distinct regions, while similar
+spectral responses may occur across different semantic classes. The resulting
+partition is therefore interpreted as a structural description of the scene
+rather than an estimate of its thematic class count.
+
+For a fixed scene run, reference labels and the semantic class count are
+excluded from Graph-RMS processing and endpoint selection. The selected
+partition is frozen before comparison with the reference map. Formally, if
+\(\mathbf{y}_{\Omega}\) denotes the available reference labels within the
+labelled-pixel set \(\Omega\), then
+
+\begin{equation}
+\widehat{\mathbf{z}}
+=
+\mathcal{F}
+\left(
+\mathbf{X},
+\mathbf{P};
+\boldsymbol{\theta}
+\right),
+\qquad
+\mathbf{y}_{\Omega}\notin
+\mathcal{F},
+\qquad
+K\notin
+\mathcal{F},
+\end{equation}
+
+where \(\mathcal{F}\) denotes the Graph-RMS computation for a given scene,
+\(\mathbf{P}\) contains the pixel coordinates, and
+\(\boldsymbol{\theta}\) contains the operating parameters and partition-based
+decision rules. This distinction concerns per-scene execution. Reference-based
+results from the eight development scenes were available while the procedure
+was being developed and were later used to calibrate the global
+automatic-selection rule. They were not inputs to the processing or endpoint
+selection of an individual target scene.
+
+Graph construction and region discovery are performed on the full image rather
+than only on pixels carrying reference labels. This preserves the spatial and
+spectral relationships that extend through unlabelled parts of the scene.
+Metrics requiring semantic references are subsequently calculated on
+\(\Omega\), whereas full-scene quantities, including the total region count,
+fragmentation pattern, runtime, and memory demand, are obtained from the complete
+partition. This separation prevents the reference mask from influencing the
+regions that are later evaluated.
+
+%==============================================================================
+% 2.2 Datasets and holdout design
+%==============================================================================
+\subsection{Datasets and holdout design}
+\label{subsec:datasets}
+
+The experiments used nine public hyperspectral scenes that differ in spatial
+extent, spectral dimensionality, land-cover composition, and reference-label
+coverage. Salinas-A, Indian Pines, KSC, Pavia University, and Botswana are
+established airborne or spaceborne benchmark scenes distributed through the
+public hyperspectral remote-sensing scene repository
+\citep{gic_hsi_scenes}. The three WHU-Hi scenes---LongKou, HongHu, and
+HanChuan---provide UAV-borne imagery of agricultural and rural--urban areas at
+high spatial resolution \citep{zhong2020}. Trento contains a rural scene
+acquired over southern Trento, Italy \citep{ghamisi2017}. Although the original
+Trento release also includes LiDAR data, the present study used only the
+hyperspectral cube and its land-cover reference.
+
+Graph-RMS processed every pixel in each scene. The reference masks were not
+used to crop the images or determine the graph domain. They were applied only
+after the final full-scene partition had been selected. This distinction is
+important because the proportion of labelled pixels varies markedly across the
+datasets. Labels cover less than 2\% of KSC and Botswana, but more than 86\% of
+HongHu and 92\% of LongKou. The full-scene graph can therefore include extensive
+areas that do not contribute directly to reference-based accuracy measures.
+
+The first eight scenes in Table~\ref{tab:datasets} formed the development set.
+Their reference labels and reference-based metrics were available while the
+primary procedure and its operating settings were being established. Trento
+was excluded from this development process. After the primary procedure had
+been fixed, the Trento cube was processed and the selected partition was
+frozen before reference-based evaluation. Trento therefore provides the
+independent holdout for the primary experiment. The later automatic-selection
+experiment was designed after this holdout result was known, so its Trento
+run is treated separately as a retrospective transfer test. The primary
+Trento experiment therefore evaluates a frozen, pre-specified scene
+configuration; it should not be interpreted as a test of automatic scale
+selection.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Characteristics and experimental roles of the nine hyperspectral
+scenes. Reference classes and labelled pixels describe the available evaluation
+maps; Graph-RMS processed each complete scene.}
+\label{tab:datasets}
+
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4.2pt}
+
+\begin{tabular}{@{}lccrrrl@{}}
+\toprule
+Dataset &
+\makecell{Spatial\\size} &
+Bands &
+\makecell{Reference\\classes} &
+\makecell{Labelled\\pixels} &
+\makecell{Coverage\\(\%)} &
+Role \\
+\midrule
+
+Salinas-A
+& $83 \times 86$
+& 204
+& 6
+& 5\,348
+& 74.92
+& Development \\
+
+Indian Pines
+& $145 \times 145$
+& 200
+& 16
+& 10\,249
+& 48.75
+& Development \\
+
+KSC
+& $512 \times 614$
+& 176
+& 13
+& 5\,211
+& 1.66
+& Development \\
+
+Pavia University
+& $610 \times 340$
+& 103
+& 9
+& 42\,776
+& 20.62
+& Development \\
+
+WHU-Hi LongKou
+& $550 \times 400$
+& 270
+& 9
+& 204\,542
+& 92.97
+& Development \\
+
+WHU-Hi HongHu
+& $940 \times 475$
+& 270
+& 22
+& 386\,693
+& 86.61
+& Development \\
+
+WHU-Hi HanChuan
+& $1217 \times 303$
+& 274
+& 16
+& 257\,530
+& 69.84
+& Development \\
+
+Botswana
+& $1476 \times 256$
+& 145
+& 14
+& 3\,248
+& 0.86
+& Development \\
+
+Trento
+& $166 \times 600$
+& 63
+& 6
+& 30\,214
+& 30.34
+& Primary holdout \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\FloatBarrier
+
+%==============================================================================
+% 2.3 Spectral preprocessing and local graph construction
+%==============================================================================
+%==============================================================================
+% 2.3 Spectral preprocessing and local graph construction
+%==============================================================================
+\subsection{Spectral preprocessing and local graph construction}
+\label{subsec:graph_construction}
+
+Graph-RMS represented each complete hyperspectral scene as a sparse weighted
+graph in which pixels formed the vertices and local spectral--spatial
+relationships formed the edges. For each reported scene run, reference labels
+were not inputs to graph construction. The same frozen graph was subsequently
+used for diffusion, fine-region extraction, and the matched Leiden comparison.
+Figure~\ref{fig:graphrms_workflow} summarises the complete processing sequence.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/graph.png}
+\caption{Processing sequence of Graph-RMS. PCA-20 was used only to rank
+candidate neighbours within a local spatial window, whereas edge weighting and
+graph diffusion used the complete standardised spectra. Reciprocal neighbour
+selection and minimum-degree repair produced the sparse graph support. Damped
+diffusion, fine-mode extraction, spatial cleanup, and reciprocal prototype
+consolidation generated candidate full-scene partitions, from which a
+partition-based rule selected the reported endpoint. Reference labels and the
+semantic class count were introduced only after the selected partition had
+been frozen.}
+\label{fig:graphrms_workflow}
+\end{figure}
+
+For pixel \(i\), let
+\(\mathbf{x}_i=[x_{i1},\ldots,x_{iB}]^{\mathsf T}\in\mathbb{R}^{B}\)
+denote its spectrum and
+\(\mathbf{p}_i=[r_i,c_i]^{\mathsf T}\in\mathbb{R}^{2}\) its row and column
+coordinates. Each spectral band was standardised across the full scene:
+
+\begin{equation}
+\widetilde{x}_{ib}
+=
+\frac{x_{ib}-\mu_b}{s_b},
+\label{eq:band_standardisation}
+\end{equation}
+
+where
+
+\begin{equation}
+\mu_b
+=
+\frac{1}{N}
+\sum_{i=1}^{N}x_{ib},
+\qquad
+s_b
+=
+\sqrt{
+\frac{1}{N-1}
+\sum_{i=1}^{N}
+\left(x_{ib}-\mu_b\right)^2
+}.
+\label{eq:band_statistics}
+\end{equation}
+
+This operation gave each band a comparable numerical scale and prevented
+high-variance wavelengths from dominating Euclidean distance. The complete
+standardised spectrum
+\(\widetilde{\mathbf{x}}_i\in\mathbb{R}^{B}\) was retained for edge weighting
+and graph diffusion.
+
+Principal component analysis (PCA) was used only to reduce the cost of local
+neighbour ranking \citep{jolliffe2016}. The standardised scene was projected
+onto its first 20 principal components:
+
+\begin{equation}
+\mathbf{u}_i
+=
+\mathbf{V}_{20}^{\mathsf T}
+\widetilde{\mathbf{x}}_i,
+\qquad
+\mathbf{u}_i\in\mathbb{R}^{20},
+\label{eq:pca_search}
+\end{equation}
+
+where
+\(\mathbf{V}_{20}\in\mathbb{R}^{B\times20}\) contains the loading vectors
+associated with the 20 largest eigenvalues of the scene-level covariance
+matrix. The reduced vectors \(\mathbf{u}_i\) were used only to identify
+candidate neighbours. They did not replace the full spectra in the affinity
+or diffusion calculations.
+
+Candidate neighbours were restricted to a square spatial window centred on
+each pixel. With a window radius of seven pixels, the candidate set was
+
+\begin{equation}
+\mathcal{W}_i
+=
+\left\{
+j\neq i:
+\left\|
+\mathbf{p}_i-\mathbf{p}_j
+\right\|_{\infty}
+\leq 7
+\right\},
+\label{eq:local_window}
+\end{equation}
+
+which corresponds to a maximum \(15\times15\) neighbourhood for an interior
+pixel. At image boundaries, the window was clipped to the available scene
+extent. Within \(\mathcal{W}_i\), the Euclidean distances
+
+\begin{equation}
+d^{\mathrm{PCA}}_{ij}
+=
+\left\|
+\mathbf{u}_i-\mathbf{u}_j
+\right\|_2
+\label{eq:pca_distance}
+\end{equation}
+
+were ranked, and up to 20 nearest local candidates were retained. The resulting
+directed candidate list for pixel \(i\) is denoted by \(\mathcal{N}_i\).
+
+An undirected edge was initially admitted only when the neighbourhood
+relationship was reciprocal:
+
+\begin{equation}
+M_{ij}
+=
+\begin{cases}
+1,
+&
+j\in\mathcal{N}_i
+\ \text{and}\
+i\in\mathcal{N}_j,
+\\[3pt]
+0,
+&
+\text{otherwise}.
+\end{cases}
+\label{eq:mutual_neighbour_gate}
+\end{equation}
+
+The reciprocal gate removed one-sided nominations that were not supported by
+the local neighbourhood geometry. Its selectivity could, however, leave
+pixels in sparse or transitional areas with insufficient connectivity.
+Graph-RMS therefore applied a minimum-degree repair. For every vertex with
+degree below four, the closest remaining candidates from
+\(\mathcal{W}_i\) were added in ascending order of
+\(d^{\mathrm{PCA}}_{ij}\) until degree four was reached or no candidate
+remained. Each added link was symmetrised, and self-loops were excluded.
+
+Let \(S_{ij}\in\{0,1\}\) denote the final graph support after reciprocal
+selection and minimum-degree repair. A supported edge received a product of
+spectral and spatial Gaussian affinities:
+
+\begin{equation}
+A_{ij}
+=
+S_{ij}
+\exp
+\left[
+-\frac{
+\left\|
+\widetilde{\mathbf{x}}_i-
+\widetilde{\mathbf{x}}_j
+\right\|_2^2
+}{
+2\sigma_x^2
+}
+\right]
+\exp
+\left[
+-\frac{
+\left\|
+\mathbf{p}_i-\mathbf{p}_j
+\right\|_2^2
+}{
+2\sigma_p^2
+}
+\right].
+\label{eq:spectral_spatial_affinity}
+\end{equation}
+
+The spectral bandwidth \(\sigma_x\) was set to the median full-spectrum
+distance among the supported edges:
+
+\begin{equation}
+\sigma_x
+=
+\operatorname{median}_{S_{ij}=1}
+\left\|
+\widetilde{\mathbf{x}}_i-
+\widetilde{\mathbf{x}}_j
+\right\|_2,
+\label{eq:spectral_bandwidth}
+\end{equation}
+
+and the spatial bandwidth was defined similarly:
+
+\begin{equation}
+\sigma_p
+=
+\operatorname{median}_{S_{ij}=1}
+\left\|
+\mathbf{p}_i-\mathbf{p}_j
+\right\|_2.
+\label{eq:spatial_bandwidth}
+\end{equation}
+
+Both bandwidths were calculated separately for each scene without labels or
+scene-specific accuracy optimisation. The multiplicative affinity assigned
+large weights only when two connected pixels were similar in both spectral
+response and spatial location. The resulting matrix
+\(\mathbf{A}\in\mathbb{R}^{N\times N}\) was symmetric, non-negative, and
+sparse. It was passed unchanged to the damped diffusion stage described in
+Section~\ref{subsec:graph_diffusion}.
+%==============================================================================
+% 2.4 Damped diffusion on the spectral--spatial graph
+%==============================================================================
+\subsection{Damped diffusion on the spectral--spatial graph}
+\label{subsec:graph_diffusion}
+
+The weighted graph provided a local description of the scene, but a direct
+edge represented only one neighbourhood step. Graph-RMS used diffusion to
+propagate the complete spectral representation through paths in this graph.
+This allowed each pixel to incorporate information from progressively wider
+spectral--spatial neighbourhoods while retaining the local geometry encoded by
+the sparse affinity matrix \citep{coifman2006,murphy2019}.
+
+Let
+\(\mathbf{A}\in\mathbb{R}^{N\times N}\) denote the symmetric affinity matrix
+defined in Eq.~\eqref{eq:spectral_spatial_affinity}. The corresponding degree
+matrix was
+
+\begin{equation}
+\mathbf{D}
+=
+\operatorname{diag}
+\left(
+\mathbf{A}\mathbf{1}
+\right),
+\qquad
+D_{ii}
+=
+\sum_{j=1}^{N}A_{ij},
+\label{eq:degree_matrix}
+\end{equation}
+
+and the row-normalised transition matrix was
+
+\begin{equation}
+\mathbf{W}
+=
+\mathbf{D}^{-1}\mathbf{A}.
+\label{eq:transition_matrix}
+\end{equation}
+
+Because the minimum-degree repair removed isolated vertices, every diagonal
+entry of \(\mathbf{D}\) was positive. Each row of \(\mathbf{W}\) therefore
+summed to one, and \(W_{ij}\) represented the proportion of information
+transferred from neighbouring pixel \(j\) to pixel \(i\).
+
+The initial node representation was the complete standardised spectral matrix,
+
+\begin{equation}
+\mathbf{Y}^{(0)}
+=
+\widetilde{\mathbf{X}}
+\in
+\mathbb{R}^{N\times B}.
+\label{eq:diffusion_initialisation}
+\end{equation}
+
+Graph-RMS updated this representation through
+
+\begin{equation}
+\mathbf{Y}^{(t+1)}
+=
+(1-\alpha)\mathbf{Y}^{(t)}
++
+\alpha\mathbf{W}\mathbf{Y}^{(t)},
+\label{eq:damped_diffusion}
+\end{equation}
+
+with the damping parameter fixed at
+
+\begin{equation}
+\alpha=0.5.
+\label{eq:diffusion_alpha}
+\end{equation}
+
+Equivalently, the representation of pixel \(i\) at iteration \(t+1\) was
+
+\begin{equation}
+\mathbf{y}^{(t+1)}_i
+=
+\frac{1}{2}\mathbf{y}^{(t)}_i
++
+\frac{1}{2}
+\sum_{j=1}^{N}
+W_{ij}\mathbf{y}^{(t)}_j.
+\label{eq:node_diffusion}
+\end{equation}
+
+Each update therefore retained half of the current pixel representation and
+replaced the remaining half with an affinity-weighted average of its graph
+neighbours. The self-retention term damped the transition process and avoided
+the two-cycle oscillation that can occur on reciprocal local graph structures.
+No model parameters were learned during diffusion.
+
+Graph-RMS did not run the update until convergence. Instead, it retained the
+representation at a finite checkpoint \(T\),
+
+\begin{equation}
+\mathbf{Y}^{(T)}
+=
+\left[
+(1-\alpha)\mathbf{I}
++
+\alpha\mathbf{W}
+\right]^{T}
+\widetilde{\mathbf{X}}.
+\label{eq:checkpoint_representation}
+\end{equation}
+
+The checkpoint controlled the graph scale represented in
+\(\mathbf{Y}^{(T)}\). Small values preserved more of the initial pixel-level
+variation, whereas additional iterations incorporated information transmitted
+through longer graph paths. The scene-specific checkpoints used in the
+primary experiment were established during method development and then frozen
+for the reported evaluation.
+
+The reported configuration used \(T=100\) for Salinas-A, KSC, Pavia
+University, WHU-Hi LongKou, WHU-Hi HanChuan, and Trento; \(T=50\) for Indian
+Pines and Botswana; and \(T=25\) for WHU-Hi HongHu. These values were fixed for the primary experiment before its reported
+evaluation. Reference-based results from the development scenes were available
+during method development, whereas the Trento reference map was not used to
+revise its held-out configuration. The effect of \(T\) was examined separately
+in the sensitivity analysis.
+
+The update was implemented using sparse compressed-row matrix multiplication.
+Only the non-zero entries of \(\mathbf{A}\) and \(\mathbf{W}\) were stored, so
+the calculation operated on the retained local graph rather than forming a
+dense \(N\times N\) matrix. The checkpoint representation
+\(\mathbf{Y}^{(T)}\) was then passed to the fine-mode extraction stage.
+
+%==============================================================================
+% 2.5 Fine-mode formation and spatial refinement
+%==============================================================================
+\subsection{Fine-mode formation and spatial refinement}
+\label{subsec:fine_modes}
+
+The finite diffusion checkpoint retained gradual variation within broad
+spectral--spatial structures. Graph-RMS converted this representation into an
+initial fine partition before attempting any region consolidation. The
+checkpoint matrix \(\mathbf{Y}^{(T)}\) was first projected onto its leading ten
+principal components \citep{jolliffe2016}:
+
+\begin{equation}
+\mathbf{h}_i
+=
+\mathbf{V}_{10}^{\mathsf T}
+\mathbf{y}_i^{(T)},
+\qquad
+\mathbf{h}_i\in\mathbb{R}^{10},
+\label{eq:fine_pca}
+\end{equation}
+
+where \(\mathbf{V}_{10}\) contains the loading vectors associated with the ten
+largest eigenvalues of the checkpoint covariance matrix. Each retained
+component was then standardised across the scene,
+
+\begin{equation}
+z_{i\ell}
+=
+\frac{h_{i\ell}-\bar{h}_{\ell}}
+{s_{h,\ell}},
+\qquad
+\ell=1,\ldots,10,
+\label{eq:fine_standardisation}
+\end{equation}
+
+The component standard deviations were calculated as population standard
+deviations. If a component standard deviation was below \(10^{-8}\), it was
+replaced by 1 before standardisation to avoid division by a numerically
+degenerate scale.
+
+The resulting representation was
+\(\mathbf{z}_i=[z_{i1},\ldots,z_{i10}]^{\mathsf T}\). This second PCA operation
+
+giving the representation
+\(\mathbf{z}_i=[z_{i1},\ldots,z_{i10}]^{\mathsf T}\). This second PCA operation
+served a different purpose from PCA-20 in Section~\ref{subsec:graph_construction}.
+PCA-20 reduced the cost of the original graph search, whereas PCA-10 described
+the geometry of the diffused checkpoint used to form fine regions.
+
+Graph-RMS next constructed a radius graph in the ten-dimensional checkpoint
+space. For computational control, no more than 50 nearest candidates were
+examined for each pixel. Let \(\mathcal{Q}^{50}_i\) denote this capped candidate
+set. An undirected fine-graph edge was retained when a candidate pair satisfied
+
+\begin{equation}
+\left\|
+\mathbf{z}_i-\mathbf{z}_j
+\right\|_2
+\leq r_f,
+\label{eq:fine_radius_condition}
+\end{equation}
+
+where \(r_f\) is the frozen fine-mode radius for the scene. The fine graph can
+therefore be written as
+
+\begin{equation}
+\mathcal{G}_{f}
+=
+\left(
+\mathcal{V},
+\mathcal{E}_{f}
+\right),
+\qquad
+\mathcal{E}_{f}
+=
+\left\{
+\{i,j\}:
+j\in\mathcal{Q}^{50}_i
+\ \text{or}\
+i\in\mathcal{Q}^{50}_j,
+\
+\left\|
+\mathbf{z}_i-\mathbf{z}_j
+\right\|_2
+\leq r_f
+\right\}.
+\label{eq:fine_graph}
+\end{equation}
+
+The connected components of \(\mathcal{G}_{f}\) defined the initial fine
+modes. If the graph contained \(M_f\) components, the corresponding label of
+pixel \(i\) was
+
+\begin{equation}
+c_i
+\in
+\left\{
+1,\ldots,M_f
+\right\}.
+\label{eq:fine_labels}
+\end{equation}
+
+This construction allowed a fine mode to follow connected structure in the
+diffused representation rather than forcing pixels into a prescribed number
+of groups.
+
+The frozen values of \(r_f\) were 0.150 for Salinas-A, 0.300 for Indian Pines,
+0.0125 for KSC, 0.150 for Pavia University, 0.200 for WHU-Hi LongKou,
+0.200 for WHU-Hi HongHu, 0.075 for WHU-Hi HanChuan, 0.150 for Botswana,
+and 0.200 for Trento. These values determined the granularity of the fine partition and formed part
+of the frozen primary configuration. Development-scene reference results were
+available while the operating settings were being established; no
+reference-based adjustment was made during the reported scene runs.
+
+Fine-mode labels were subsequently refined using a spatial majority filter.
+For pixel \(i\), the spatial neighbourhood was
+
+\begin{equation}
+\mathcal{B}^{(3)}_i
+=
+\left\{
+j:
+\left\|
+\mathbf{p}_i-\mathbf{p}_j
+\right\|_{\infty}
+\leq 3
+\right\},
+\label{eq:cleanup_neighbourhood}
+\end{equation}
+
+which corresponds to a \(7\times7\) window for an interior pixel. For each
+fine-mode label \(a\), its local count was
+
+\begin{equation}
+n_{ia}
+=
+\sum_{j\in\mathcal{B}^{(3)}_i}
+\mathbb{I}
+\left(
+c_j=a
+\right).
+\label{eq:local_label_count}
+\end{equation}
+
+When one label had a unique maximum count, that label was assigned to the
+centre pixel. If two or more labels shared the maximum, the centre label was
+retained:
+
+\begin{equation}
+\widetilde{c}_i
+=
+\begin{cases}
+\displaystyle
+\arg\max_a n_{ia},
+&
+\text{if the maximum is unique},
+\\[6pt]
+c_i,
+&
+\text{otherwise}.
+\end{cases}
+\label{eq:majority_cleanup}
+\end{equation}
+
+Retaining the centre label on ties avoided changes caused only by arbitrary
+numeric ordering of the region identifiers. The cleaned labels
+\(\widetilde{c}_i\) formed the fine-region input to prototype consolidation.
+
+%==============================================================================
+% 2.6 Reciprocal consolidation of region prototypes
+%==============================================================================
+%==============================================================================
+% 2.6 Reciprocal consolidation of region prototypes
+%==============================================================================
+\subsection{Reciprocal consolidation of region prototypes}
+\label{subsec:prototype_consolidation}
+
+The cleaned fine partition was deliberately detailed and could retain several
+modes within a broader spectral--spatial structure. Graph-RMS consolidated
+compatible fine regions by comparing their prototypes in the standardised
+diffusion-PCA space. This stage used only the diffused features, region
+memberships, and region sizes; reference labels and the semantic class count
+remained unavailable.
+
+Let
+
+\begin{equation}
+\mathcal{R}_a
+=
+\left\{
+i:\widetilde{c}_i=a
+\right\}
+\label{eq:fine_region}
+\end{equation}
+
+denote fine region \(a\), with size
+
+\begin{equation}
+n_a
+=
+\left|\mathcal{R}_a\right|.
+\label{eq:region_size}
+\end{equation}
+
+Its prototype centroid was calculated from the standardised diffusion-PCA
+features \(\mathbf{z}_i\in\mathbb{R}^{d}\), where \(d\leq10\):
+
+\begin{equation}
+\boldsymbol{\mu}_a
+=
+\frac{1}{n_a}
+\sum_{i\in\mathcal{R}_a}
+\mathbf{z}_i.
+\label{eq:prototype_centroid}
+\end{equation}
+
+The raw within-region dispersion was the root-mean-square Euclidean radius,
+
+\begin{equation}
+s_a^{\mathrm{raw}}
+=
+\sqrt{
+\frac{1}{n_a}
+\sum_{i\in\mathcal{R}_a}
+\left\|
+\mathbf{z}_i-\boldsymbol{\mu}_a
+\right\|_2^2
+}.
+\label{eq:raw_prototype_dispersion}
+\end{equation}
+Here, root mean square refers only to the dispersion statistic in
+Eq.~\eqref{eq:raw_prototype_dispersion}; the RMS acronym in Graph-RMS denotes
+Robust Mean Shift.
+
+This quantity is equivalent to the square root of the trace of the population
+covariance matrix of region \(a\), using a divisor of \(n_a\) rather than
+\(n_a-1\).
+
+Very small or singleton regions can have zero or near-zero dispersion. To
+prevent them from producing unstable normalised distances, Graph-RMS formed
+the reference set
+
+\begin{equation}
+\mathcal{S}
+=
+\left\{
+s_b^{\mathrm{raw}}:
+s_b^{\mathrm{raw}}>10^{-6},
+\;
+n_b\geq5
+\right\}.
+\label{eq:dispersion_reference_set}
+\end{equation}
+
+The dispersion floor was then defined as
+
+\begin{equation}
+f
+=
+\begin{cases}
+Q_{0.25}\!\left(\mathcal{S}\right),
+&
+\mathcal{S}\neq\varnothing,
+\\[4pt]
+10^{-3},
+&
+\mathcal{S}=\varnothing,
+\end{cases}
+\label{eq:dispersion_floor}
+\end{equation}
+
+where \(Q_{0.25}\) denotes the first quartile. The dispersion used in prototype
+comparison was
+
+\begin{equation}
+s_a
+=
+\max
+\left(
+s_a^{\mathrm{raw}},f
+\right).
+\label{eq:floored_dispersion}
+\end{equation}
+
+The size term was defined relative to the median size of the current
+prototypes:
+
+\begin{equation}
+q_a
+=
+\frac{
+n_a
+}{
+\max\left(
+\operatorname{median}_{b}n_b,1
+\right)
+}.
+\label{eq:prototype_size_ratio}
+\end{equation}
+
+Graph-RMS generated a conservative and a size-aware consolidation endpoint
+using
+
+\begin{equation}
+\beta\in\{0,0.5\}.
+\label{eq:size_exponents}
+\end{equation}
+
+For a given \(\beta\), the size-adjusted dispersion was
+
+\begin{equation}
+\widehat{s}_a^{(\beta)}
+=
+\frac{s_a}{
+\left[
+\max\left(q_a,10^{-8}\right)
+\right]^{\beta}
+}.
+\label{eq:size_adjusted_dispersion}
+\end{equation}
+
+When \(\beta=0\), prototype comparison depended only on within-region
+dispersion. With \(\beta=0.5\), the effective dispersion increased for small
+regions, allowing a small region to merge more readily with a compatible
+larger neighbour.
+
+The normalised separation between prototypes \(a\) and \(b\) was
+
+\begin{equation}
+\delta_{ab}^{(\beta)}
+=
+\frac{
+\left\|
+\boldsymbol{\mu}_a-\boldsymbol{\mu}_b
+\right\|_2
+}{
+\max
+\left[
+\sqrt{
+\left(
+\widehat{s}_a^{(\beta)}
+\right)^2
++
+\left(
+\widehat{s}_b^{(\beta)}
+\right)^2
+},
+10^{-8}
+\right]
+}.
+\label{eq:prototype_distance}
+\end{equation}
+
+The \(10^{-8}\) guard prevented division by zero without materially changing
+non-degenerate prototype distances.
+
+At each consolidation round, up to 30 nearest prototype candidates were
+retained for every current region. A pair \((a,b)\) was eligible only when the
+candidate relation was reciprocal and its normalised separation did not exceed
+the frozen threshold \(\tau\):
+
+\begin{equation}
+b\in\mathcal{Q}^{30}_a,
+\qquad
+a\in\mathcal{Q}^{30}_b,
+\qquad
+\delta_{ab}^{(\beta)}
+\leq\tau,
+\label{eq:reciprocal_merge_rule}
+\end{equation}
+
+where \(\mathcal{Q}^{30}_a\) denotes the prototype-neighbour set of region
+\(a\). Reciprocal nomination reduced the chance that a compact prototype would
+be merged solely because it appeared in the broad neighbourhood of a more
+dispersed region.
+
+When regions \(a\) and \(b\) were merged into region \(c\), their size and
+centroid were updated exactly:
+
+\begin{equation}
+n_c
+=
+n_a+n_b,
+\label{eq:merged_region_size}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{\mu}_c
+=
+\frac{
+n_a\boldsymbol{\mu}_a+
+n_b\boldsymbol{\mu}_b
+}{
+n_a+n_b
+}.
+\label{eq:merged_centroid}
+\end{equation}
+
+The merged dispersion was updated from the current prototype statistics:
+
+\begin{equation}
+s_c
+=
+\sqrt{
+\frac{
+n_a
+\left[
+s_a^2+
+\left\|
+\boldsymbol{\mu}_a-\boldsymbol{\mu}_c
+\right\|_2^2
+\right]
++
+n_b
+\left[
+s_b^2+
+\left\|
+\boldsymbol{\mu}_b-\boldsymbol{\mu}_c
+\right\|_2^2
+\right]
+}{
+n_c
+}
+}.
+\label{eq:pooled_dispersion}
+\end{equation}
+
+The dispersions entering this recursion already included the floor defined in
+Eq.~\eqref{eq:dispersion_floor}. The floor was calculated once from the
+initial fine modes and was not re-estimated after subsequent merges. The
+update accounts for both within-region dispersion and separation between the
+two prototype centroids.
+
+After each round, Graph-RMS recomputed the current prototype neighbourhoods,
+normalised separations, and eligible reciprocal pairs. This round-wise update
+prevented unrestricted single-link chaining based on distances calculated
+before earlier merges. Consolidation ended when a complete round produced no
+eligible pair.
+
+The prototype thresholds associated with the reported primary endpoints were
+\(\tau=0.75\) for Salinas-A, \(0.60\) for Indian Pines, \(3.00\) for KSC,
+\(3.00\) for Pavia University, \(0.50\) for WHU-Hi LongKou, \(0.75\) for
+WHU-Hi HongHu, \(3.00\) for WHU-Hi HanChuan, \(0.65\) for Botswana, and
+\(0.75\) for Trento. These scene-specific thresholds formed part of the
+frozen primary configuration. For a fixed scene run, the conservative and
+size-aware branches were then evaluated through the same partition-based
+endpoint rule. Eight scenes retained the size-aware endpoint with
+\(\beta=0.5\), while WHU-Hi LongKou used the conservative fallback with
+\(\beta=0\). Reference labels and reference-based metrics were not inputs to
+this branch-selection step.
+
+
+%==============================================================================
+% 2.7 Label-free endpoint selection and abstention
+%==============================================================================
+\subsection{Partition-based endpoint selection and abstention}
+\label{subsec:endpoint_selection}
+
+Prototype consolidation produced a sequence of candidate partitions rather
+than a single automatically accepted result. Increasing the consolidation
+threshold generally reduced the number of regions, but excessive consolidation
+could also create a dominant region or an unbalanced partition. Graph-RMS
+therefore selected an endpoint from full-scene partition properties alone.
+Reference labels, reference-based metrics, and the semantic class count were
+not available to this procedure.
+
+Let
+
+\begin{equation}
+\mathcal{P}_{\ell}
+=
+\left\{
+\mathcal{R}_{\ell 1},
+\ldots,
+\mathcal{R}_{\ell M_{\ell}}
+\right\}
+\label{eq:candidate_partition}
+\end{equation}
+
+denote the partition obtained at consolidation threshold
+\(\tau_{\ell}\), where \(M_{\ell}\) is its full-scene region count.
+Thresholds were evaluated in increasing order on a fixed candidate grid.
+
+The persistence of a candidate was measured through the adjusted Rand
+agreement between consecutive full-scene partitions
+\citep{hubert1985}:
+
+\begin{equation}
+S_{\ell}
+=
+\operatorname{ARI}
+\left(
+\mathcal{P}_{\ell-1},
+\mathcal{P}_{\ell}
+\right).
+\label{eq:selector_stability}
+\end{equation}
+
+This use of ARI did not involve a reference map. It compared two candidate
+Graph-RMS partitions over the same pixels and measured whether a change in
+threshold substantially altered the region assignment.
+
+Three additional quantities were calculated for each candidate. The fraction
+of pixels assigned to its largest region was
+
+\begin{equation}
+L_{\ell}
+=
+\max_{m\in\{1,\ldots,M_{\ell}\}}
+\frac{
+\left|
+\mathcal{R}_{\ell m}
+\right|
+}{N}.
+\label{eq:largest_region_fraction}
+\end{equation}
+
+Let
+
+\begin{equation}
+q_{\ell m}
+=
+\frac{
+\left|
+\mathcal{R}_{\ell m}
+\right|
+}{N}
+\label{eq:region_proportion}
+\end{equation}
+
+denote the relative size of region \(m\). The normalised partition entropy was
+
+\begin{equation}
+E_{\ell}
+=
+-\frac{
+\displaystyle
+\sum_{m=1}^{M_{\ell}}
+q_{\ell m}\log q_{\ell m}
+}{
+\log M_{\ell}
+},
+\qquad
+M_{\ell}>1,
+\label{eq:normalized_partition_entropy}
+\end{equation}
+
+with \(E_{\ell}=0\) when \(M_{\ell}=1\). Higher values indicate that the
+partition mass is distributed across several regions rather than concentrated
+in one dominant component.
+
+Compression relative to the cleaned fine partition was defined as
+
+\begin{equation}
+C_{\ell}
+=
+1-
+\frac{M_{\ell}}{M_f},
+\label{eq:selector_compression}
+\end{equation}
+
+where \(M_f\) is the number of fine regions before prototype consolidation.
+A value of \(C_{\ell}=0\) indicates that consolidation retained the fine-region
+count, whereas larger values indicate progressively stronger compression.
+
+A size-aware candidate was admissible only when all four conditions were met:
+
+\begin{equation}
+S_{\ell}\geq0.95,
+\qquad
+L_{\ell}\leq0.40,
+\qquad
+E_{\ell}\geq0.35,
+\qquad
+C_{\ell}\geq0.20.
+\label{eq:selector_conditions}
+\end{equation}
+
+The stability condition required the candidate to lie within a persistent part
+of the consolidation sequence. The largest-region and entropy conditions
+rejected collapsed or strongly unbalanced partitions, while the compression
+condition required consolidation to produce a material reduction in the
+fine-region count.
+
+Among the persistent size-aware candidates satisfying
+Eq.~\eqref{eq:selector_conditions}, Graph-RMS retained the most compressed
+endpoint:
+
+\begin{equation}
+\ell^{\star}
+=
+\arg\min_{\ell\in\mathcal{A}}
+M_{\ell},
+\label{eq:selected_endpoint}
+\end{equation}
+
+where \(\mathcal{A}\) is the set of admissible endpoints. If the size-aware
+branch did not contain an admissible endpoint, the procedure retained the
+corresponding conservative partition obtained with \(\beta=0\). This fallback
+prevented the size term from forcing consolidation when the resulting
+partition failed the stability or degeneracy checks.
+
+For adaptive re-selection under perturbation, Graph-RMS could also abstain.
+Abstention occurred when neither branch contained a persistent,
+non-degenerate endpoint. In that case, the threshold-zero partition was
+retained for diagnostic inspection, but the method did not present it as a
+selected compressed solution. The selector status---size-aware selection,
+conservative fallback, or abstention---was stored with the partition.
+
+Once the endpoint had been selected, its region labels, threshold, size
+exponent, and selector status were frozen. Only then was the reference mask
+introduced for quantitative evaluation.
+
+\begin{algorithm}[!t]
+\caption{Graph-RMS full-scene region discovery}
+\label{alg:graphrms}
+\small
+
+\begin{algorithmic}
+
+\Require
+\parbox[t]{0.82\linewidth}{
+Hyperspectral cube \(\mathbf{X}\), pixel coordinates \(\mathbf{P}\),
+spatial radius \(r_w\), neighbour count \(k\), minimum degree
+\(d_{\min}\), diffusion checkpoint \(T\), fine-mode radius \(r_f\),
+and consolidation settings
+}
+
+\Ensure
+\parbox[t]{0.82\linewidth}{
+Selected full-scene partition \(\widehat{\mathcal{P}}\) and endpoint status
+}
+
+\Statex
+\Statex \textbf{Stage 1: Spectral--spatial graph construction}
+\State Standardise each spectral band over the complete scene
+\State Project the spectra to PCA-\(20\) for local neighbour ranking
+\State Find up to \(k\) candidates within the \(r_w\)-pixel spatial window
+\State Retain reciprocal neighbours and repair vertices below \(d_{\min}\)
+\State Compute full-spectrum spectral--spatial affinities
+\State Form the sparse row-normalised transition matrix \(\mathbf{W}\)
+
+\Statex
+\Statex \textbf{Stage 2: Diffusion and fine-mode formation}
+\State Initialise \(\mathbf{Y}^{(0)}\) with the standardised full spectra
+\For{\(t=0,\ldots,T-1\)}
+    \State
+    \(\mathbf{Y}^{(t+1)}
+    \gets
+    (1-\alpha)\mathbf{Y}^{(t)}
+    +
+    \alpha\mathbf{W}\mathbf{Y}^{(t)}\)
+\EndFor
+\State Project \(\mathbf{Y}^{(T)}\) to at most ten standardised components
+\State Form a capped radius graph using \(r_f\)
+\State Assign connected components as fine modes
+\State Apply spatial majority cleanup
+
+\Statex
+\Statex \textbf{Stage 3: Reciprocal prototype consolidation}
+\For{\(\beta\in\{0,0.5\}\)}
+    \State Compute region centroids, sizes, and floored dispersions
+    \Repeat
+        \State Find reciprocal prototype pairs satisfying the merge threshold
+        \State Merge eligible pairs and update pooled prototype statistics
+    \Until{no eligible pair remains}
+    \State Store the resulting candidate partition sequence
+\EndFor
+
+\Statex
+\Statex \textbf{Stage 4: Partition-based endpoint selection}
+\State Evaluate persistence, largest-region fraction, entropy, and compression
+\State Select an admissible endpoint, use the conservative fallback, or abstain
+\State Freeze \(\widehat{\mathcal{P}}\) before reference-based evaluation
+
+\Statex
+\Statex \textit{Reference labels and the semantic class count are not inputs to the steps above.}
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Frozen operating settings for the primary Graph-RMS experiment.
+Panel A lists settings shared by all scenes, and Panel B gives the
+scene-specific diffusion, fine-mode, and consolidation settings.}
+\label{tab:frozen_pipeline}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{4.5pt}
+
+\begin{tabular}{@{}ll@{}}
+\toprule
+\multicolumn{2}{@{}l}{\textit{Panel A: Shared settings}} \\
+\addlinespace[2pt]
+Quantity & Setting \\
+\midrule
+Neighbour-ranking representation & PCA-20 \\
+Spatial-window radius & \(r_w=7\) pixels \\
+Maximum local neighbours & \(k=20\) \\
+Minimum repaired degree & \(d_{\min}=4\) \\
+Diffusion damping & \(\alpha=0.5\) \\
+Fine-mode representation & At most 10 standardised PCs \\
+Fine-neighbour cap & 50 \\
+Spatial-cleanup radius & 3 pixels \\
+Prototype-neighbour cap & 30 \\
+Dispersion reference size & \(n_a\geq5\) \\
+Dispersion-floor quantile & \(Q_{0.25}\) \\
+Dispersion fallback & \(10^{-3}\) \\
+Size exponents & \(\beta\in\{0,0.5\}\) \\
+Endpoint stability & \(S_{\ell}\geq0.95\) \\
+Largest-region fraction & \(L_{\ell}\leq0.40\) \\
+Normalised entropy & \(E_{\ell}\geq0.35\) \\
+Minimum compression & \(C_{\ell}\geq0.20\) \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Panel B: Scene-specific primary settings}} \\
+\addlinespace[2pt]
+Dataset & \(T,\ r_f,\ \tau,\ \beta\) \\
+\midrule
+Salinas-A & \(100,\ 0.150,\ 0.75,\ 0.5\) \\
+Indian Pines & \(50,\ 0.300,\ 0.60,\ 0.5\) \\
+KSC & \(100,\ 0.0125,\ 3.00,\ 0.5\) \\
+Pavia University & \(100,\ 0.150,\ 3.00,\ 0.5\) \\
+WHU-Hi LongKou & \(100,\ 0.200,\ 0.50,\ 0.0\) \\
+WHU-Hi HongHu & \(25,\ 0.200,\ 0.75,\ 0.5\) \\
+WHU-Hi HanChuan & \(100,\ 0.075,\ 3.00,\ 0.5\) \\
+Botswana & \(50,\ 0.150,\ 0.65,\ 0.5\) \\
+Trento & \(100,\ 0.200,\ 0.75,\ 0.5\) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Automatic operating-point selection}
+\label{subsec:auto_selector}
+
+The primary experiment retained scene-specific values of the diffusion
+checkpoint, fine-mode radius, and prototype-consolidation settings. A separate
+experiment examined whether these operating choices could instead be selected
+for an individual scene without using its reference labels or semantic class
+count.
+
+The experiment separated global rule calibration from per-scene selection.
+One selection rule was calibrated on the eight development scenes from a
+predefined rule grid. Reference-based NMI and ARI from these scenes were used
+only at this calibration stage to choose the global rule. The selected rule
+was then fixed. Subsequent application to an individual scene used only the
+hyperspectral cube and partition statistics; its reference labels and \(K\)
+were not available to the selector.
+
+Four diffusion checkpoints were examined:
+
+\begin{equation}
+T\in\{25,50,100,200\}.
+\label{eq:auto_T_grid}
+\end{equation}
+
+At checkpoint \(T\), the tenth non-self-neighbour distance was calculated for
+each pixel in the standardised diffusion-PCA representation. The scene scale
+was defined as
+
+\begin{equation}
+s_T
+=
+\operatorname{median}_{i}
+d_{i,(10)},
+\label{eq:auto_scene_scale}
+\end{equation}
+
+using positive finite distances only. The fine-mode radius was then
+normalised to this scale:
+
+\begin{equation}
+r_f
+=
+\gamma s_T,
+\qquad
+\gamma
+\in
+\{0.75,1.00,1.25,1.50\}.
+\label{eq:auto_radius}
+\end{equation}
+
+Prototype consolidation was evaluated over
+
+\begin{equation}
+\tau\in
+\{
+0,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,
+0.50,0.55,0.60,0.65,0.70,0.75,1.0,1.5,2.0,3.0
+\},
+\label{eq:auto_tau_grid}
+\end{equation}
+
+with
+
+\begin{equation}
+\beta\in\{0,0.5\}.
+\label{eq:auto_beta_grid}
+\end{equation}
+
+Candidate endpoints first had to satisfy the existing largest-region, entropy,
+compression, and adjacent-threshold persistence requirements. The global rule
+search then considered adjacent-\(T/\gamma\) stability thresholds from 0.80
+to 0.90, maximum compression values of 0.85, 0.90, and 0.95, and minimum
+agreement between the two \(\beta\) branches from 0.50 to 0.90. Rule
+selection first maximised the number of development scenes for which an
+admissible operating point was found and then maximised mean
+\((\mathrm{NMI}+\mathrm{ARI})/2\). Remaining ties favoured higher stability,
+lower maximum compression, and stronger agreement between the two
+\(\beta\) branches.
+
+The locked rule required adjacent-\(T/\gamma\) stability of at least 0.80,
+maximum compression of 0.85, and agreement between the two \(\beta\) branches
+of at least 0.90 before the size-aware branch could be selected. Stable support
+had to extend across at least two adjacent \(T/\gamma\) settings. Within each
+branch, the stable component with the greatest support was retained, with ties
+resolved by mean stability. Its representative then favoured higher stability,
+proximity to the component centre, and lower compression. The size-aware
+branch was retained only when it had greater stable support, or equal support
+with at least 0.01 higher mean stability; otherwise the conservative
+\(\beta=0\) branch was used. If no stable component remained, the selector
+abstained rather than returning an unsupported operating point.
+
+The rule was fixed after calibration on the eight development scenes. Because
+the primary Trento result was already known when this experiment was designed,
+the later automatic Trento run was treated as a retrospective transfer test
+rather than an independent holdout.
+%==============================================================================
+% 2.8 Comparison methods and fairness controls
+%==============================================================================
+\subsection{Comparison methods and fairness controls}
+\label{subsec:baselines}
+
+The comparison methods were separated according to whether they received the
+reference class count. This distinction is necessary because a method supplied
+with the true number of classes does not operate under the same information
+constraints as Graph-RMS. All methods processed the complete hyperspectral
+scene. Reference labels were introduced only after a partition had been
+obtained.
+
+The conventional comparison included PCA-KMeans, MiniBatch-KMeans, fuzzy
+\(c\)-means (FCM), and SLIC-KMeans. K-means minimises within-cluster
+squared distance to a set of centroids \citep{lloyd1982}, while
+MiniBatch-KMeans approximates this optimisation through successive
+mini-batches \citep{sculley2010}. FCM assigns graded memberships during
+optimisation \citep{bezdek1984}. SLIC-KMeans first forms spatially compact
+superpixels using SLIC \citep{achanta2012} and then groups their spectral
+representations using K-means.
+
+For these four methods, each band was standardised across the full scene and
+the spectra were projected onto 20 principal components. The reference class
+count \(K\) was supplied as the requested number of clusters. No labelled
+pixels were used to estimate the PCA representation or tune the remaining
+settings. Each method was evaluated with five fixed random seeds, and the
+scene-level mean was used in the classical comparison.
+
+HDBSCAN and Leiden formed a separate comparison because neither method received
+the reference class count. HDBSCAN was applied to the standardised PCA-20 representation using a
+fixed-default configuration \citep{campello2013}. It was included as a
+density-based reference rather than as an exhaustively optimised competitor;
+no scene-specific or reference-based parameter tuning was performed. Pixels identified as noise retained the label \(-1\)
+during evaluation. They were not removed, reassigned, or treated as correctly
+classified background pixels.
+
+Leiden community detection was applied to the exact weighted graph constructed
+for Graph-RMS \citep{traag2019}. Its resolution was selected from a fixed grid
+using only partition-level information, including agreement across selector
+runs, agreement between adjacent resolutions, the largest-community fraction,
+and normalised partition entropy. Reference labels and the reference class
+count were excluded from this selection. The selected resolution was then
+evaluated over five fixed seeds.
+
+The Leiden comparison holds graph construction constant. Differences between
+Leiden and Graph-RMS therefore arise after the weighted graph has been formed:
+Leiden directly optimises graph communities, whereas Graph-RMS applies damped
+diffusion, fine-mode formation, spatial refinement, and reciprocal prototype
+consolidation. HDBSCAN instead provides a generic density-based comparison on
+the PCA representation.
+
+Results from the four true-\(K\) methods and the two no-\(K\) methods were
+reported in separate comparison groups. The classical methods were analysed
+within the predefined Friedman and Holm-corrected family. HDBSCAN and Leiden
+were examined in a separate paired no-\(K\) analysis so that methods operating
+under different information conditions were not combined in the same
+inferential family.
+
+Recent self-supervised hyperspectral clustering methods learn spectral--spatial
+representations from augmented image patches before applying a separate
+clustering stage. They were not included in the present comparison because
+their training procedures, patch-sampling protocols, augmentation choices, and
+frequent use of a prescribed output count differ materially from the
+training-free, full-scene, unknown-\(K\) setting examined here. A fair
+comparison would require a separate study in which these design choices and
+computational budgets are standardised rather than adapting one implementation
+to the present protocol.
+%==============================================================================
+% 2.9 Evaluation measures and statistical analysis
+%==============================================================================
+\subsection{Evaluation measures and statistical analysis}
+\label{subsec:evaluation}
+
+Graph-RMS produced a partition of every pixel in the complete scene, whereas
+reference-based evaluation was restricted to the labelled-pixel set
+\(\Omega\). Let \(N_{\Omega}=|\Omega|\), let \(y_i\in\{1,\ldots,K\}\)
+denote the reference class of labelled pixel \(i\), and let
+\(\widehat{z}_i\in\{1,\ldots,\widehat{M}\}\) denote its predicted region.
+Here, \(K\) is used only during evaluation and does not enter Graph-RMS fitting
+or endpoint selection.
+
+Overall accuracy (OA) and balanced accuracy (BA) require semantic correspondence
+between predicted regions and reference classes. This correspondence was
+obtained through one-to-one Hungarian assignment \citep{munkres1957}. Let
+\(C_{km}\) denote the number of labelled pixels from reference class \(k\)
+assigned to predicted region \(m\). The evaluation mapping was
+
+\begin{equation}
+\pi^{\star}
+=
+\arg\max_{\pi}
+\sum_{k=1}^{K}
+C_{k,\pi(k)},
+\label{eq:hungarian_mapping}
+\end{equation}
+
+where \(\pi\) is a one-to-one assignment between reference classes and
+predicted regions. When the predicted partition contained more regions than
+reference classes, unmatched regions remained unmatched and their pixels were
+counted as errors. This treatment penalised semantic fragmentation rather than
+mapping several predicted regions to the same reference class.
+
+After alignment, OA was calculated as
+
+\begin{equation}
+\mathrm{OA}
+=
+\frac{1}{N_{\Omega}}
+\sum_{i\in\Omega}
+\mathbb{I}
+\left(
+\pi^{\star}(\widehat{z}_i)=y_i
+\right),
+\label{eq:overall_accuracy}
+\end{equation}
+
+and BA was the unweighted mean of the class-specific recalls:
+
+\begin{equation}
+\mathrm{BA}
+=
+\frac{1}{K}
+\sum_{k=1}^{K}
+\frac{
+\displaystyle
+\sum_{i\in\Omega}
+\mathbb{I}
+\left(
+y_i=k
+\ \land\
+\pi^{\star}(\widehat{z}_i)=k
+\right)
+}{
+\displaystyle
+\sum_{i\in\Omega}
+\mathbb{I}(y_i=k)
+}.
+\label{eq:balanced_accuracy}
+\end{equation}
+
+OA describes the proportion of correctly aligned labelled pixels, whereas BA
+gives equal weight to every reference class and is less dominated by large
+classes.
+
+Normalised mutual information (NMI) measured the information shared by the
+predicted and reference partitions, and the adjusted Rand index (ARI) measured
+pairwise partition agreement after correction for chance
+\citep{hubert1985,vinh2010}. Both measures are invariant to the numeric region
+identifiers and therefore do not require Hungarian alignment.
+
+Because Graph-RMS is designed for structural region discovery rather than a
+one-region-per-class semantic partition, NMI and ARI were treated as the
+principal measures of partition correspondence. OA and BA were retained as
+complementary semantic-alignment measures under one-to-one Hungarian matching.
+Their interpretation therefore includes the penalty incurred when several
+discovered regions correspond to the same reference class.
+
+Adjusted mutual information (AMI), homogeneity, completeness, and V-measure
+were calculated as supplementary information-based diagnostics
+\citep{vinh2010}. AMI was included to examine whether NMI was affected by the
+number of predicted regions. Homogeneity measures whether individual predicted
+regions contain pixels from a single reference class, while completeness
+measures whether pixels belonging to one reference class remain within the
+same predicted region. V-measure is their harmonic mean.
+
+The full-scene region count,
+
+\begin{equation}
+\widehat{M}_{\mathrm{full}}
+=
+\left|
+\left\{
+\widehat{z}_i:
+i=1,\ldots,N
+\right\}
+\right|,
+\label{eq:full_region_count}
+\end{equation}
+
+was distinguished from the number of predicted regions intersecting the
+reference mask,
+
+\begin{equation}
+\widehat{M}_{\Omega}
+=
+\left|
+\left\{
+\widehat{z}_i:
+i\in\Omega
+\right\}
+\right|.
+\label{eq:evaluation_region_count}
+\end{equation}
+
+This distinction was necessary for scenes such as KSC and Botswana, where only
+a small fraction of the complete image carries reference labels.
+
+Semantic fragmentation was examined through the ratios
+\(\widehat{M}_{\mathrm{full}}/K\) and
+\(\widehat{M}_{\Omega}/K\), many-to-one cluster purity, the difference between
+many-to-one purity and one-to-one OA, and the number of predicted regions
+required to cover 90\% of each reference class. The dominant-region fraction
+and normalised within-class fragmentation entropy were also recorded. These
+quantities describe how a structurally detailed partition relates to the
+broader semantic categories in the reference map.
+
+Graph-RMS is deterministic under a fixed computational path. Its uncertainty
+was therefore not represented by an artificial across-seed standard deviation.
+Instead, 300 spatial block-bootstrap replicates were generated for every scene
+using the frozen scene-specific block sizes. OA, BA, NMI, and ARI were
+recalculated for each replicate, and the 2.5th and 97.5th percentiles formed
+the reported 95\% intervals. Spatial blocks were used in place of independent
+pixel resampling to preserve part of the local dependence present in image
+data \citep{lahiri2003}.
+
+Cross-scene statistical tests were used as supporting summaries rather than as
+the principal basis for method comparison. Graph-RMS, PCA-KMeans,
+MiniBatch-KMeans, FCM, and SLIC-KMeans were ranked separately for OA, BA,
+NMI, and ARI across the nine paired scenes. For each classical baseline, the
+mean of five seeded runs represented its scene-level performance. Average
+ranks and Friedman tests were reported for each metric
+\citep{friedman1937}. Exact two-sided Wilcoxon signed-rank tests were also
+calculated between Graph-RMS and each classical baseline
+\citep{wilcoxon1945}, with Holm's procedure controlling the family-wise error
+rate across the 16 pairwise comparisons \citep{holm1979}. With only nine
+paired scenes, these tests have limited power and were interpreted alongside
+the scene-level values and ranks rather than as evidence required to establish
+superiority.
+
+The matched no-\(K\) comparisons were summarised separately. Graph-RMS was
+compared with HDBSCAN and Leiden using exact two-sided paired Wilcoxon tests,
+with one aggregate value per scene and metric. These values are reported as
+supporting cross-scene summaries because the no-\(K\) methods address a
+different information-access setting and the sample of benchmark scenes is
+small.
+
+%==============================================================================
+% 2.10 Diagnostic analyses and computational profiling
+%==============================================================================
+\subsection{Diagnostic analyses and computational assessment}
+\label{subsec:additional_analysis}
+
+The primary comparison was supplemented by experiments designed to examine
+where the Graph-RMS partition came from, how it changed around the frozen
+settings, and what computational resources were required. These analyses were
+specified separately from the principal nine-scene comparison and were not
+used to modify the Trento holdout configuration.
+
+\subsubsection{Component ablation}
+
+Component ablation was conducted on Pavia University because the scene is large
+enough to expose graph and consolidation behaviour while remaining practical
+for repeated execution. Each variant altered one part of the frozen procedure
+and retained the remaining settings.
+
+The evaluated variants were:
+
+\begin{enumerate}[label=(\roman*)]
+\item removal of the mutual-neighbour gate;
+\item removal of the spatial term from the graph affinity;
+\item removal of diffusion by setting \(T=0\);
+\item removal of the spatial majority cleanup;
+\item removal of fine-mode grouping;
+\item complete removal of prototype consolidation; and
+\item consolidation without size weighting, corresponding to
+      \(\beta=0\).
+\end{enumerate}
+
+For every variant, the full-scene region count, OA, BA, NMI, ARI, and
+end-to-end runtime were recorded. The ablation was interpreted component by
+component because removal of one stage can improve one semantic metric while
+reducing another. No single metric was used as a sufficient test of component
+necessity.
+
+\subsubsection{Parameter sensitivity}
+
+Sensitivity was assessed on the development scenes Salinas-A, Indian Pines,
+and Pavia University. Four operating parameters were varied one at a time:
+the local-window radius, the PCA dimension used for neighbour ranking, the
+diffusion checkpoint, and the fine-mode radius. All parameters not under study
+were held at their frozen scene values.
+
+The tested window radii were
+
+\begin{equation}
+r_w\in\{3,5,7,9\},
+\label{eq:sensitivity_window}
+\end{equation}
+
+and the tested PCA dimensions were
+
+\begin{equation}
+d_{\mathrm{PCA}}
+\in
+\{10,20,30,40\}.
+\label{eq:sensitivity_pca}
+\end{equation}
+
+For Salinas-A and Pavia University, the diffusion checkpoints were
+
+\begin{equation}
+T\in\{25,50,100,200\},
+\label{eq:sensitivity_checkpoint_sp}
+\end{equation}
+
+whereas Indian Pines used
+
+\begin{equation}
+T\in\{12,25,50,100\}.
+\label{eq:sensitivity_checkpoint_ip}
+\end{equation}
+
+The fine-mode radii for Salinas-A and Pavia University were
+
+\begin{equation}
+r_f
+\in
+\{0.075,0.1125,0.150,0.1875,0.225\},
+\label{eq:sensitivity_radius_sp}
+\end{equation}
+
+and Indian Pines used
+
+\begin{equation}
+r_f
+\in
+\{0.150,0.225,0.300,0.375,0.450\}.
+\label{eq:sensitivity_radius_ip}
+\end{equation}
+
+The complete sensitivity study contained 51 runs. Each run recorded the final
+full-scene region count, largest-region fraction, normalised partition entropy,
+OA, BA, NMI, ARI, runtime, and memory use. Single-region outputs and other
+selector-degenerate outcomes were identified explicitly rather than removed
+from the sensitivity range.
+
+\subsubsection{Endpoint-selector audit}
+
+The partition-based selector was examined independently of the primary
+performance comparison. For every candidate consolidation endpoint, the stored
+reference-free partition statistics were compared with the reference-based
+metrics only after selection had been completed. This analysis measured the gap between the
+selected endpoint and the best candidate that could have been chosen
+retrospectively for OA, BA, NMI, or ARI. These oracle gaps were diagnostic and
+did not alter the reported partition.
+
+Rule ablations also examined the consequences of removing the persistence,
+largest-region, entropy, and compression requirements. In particular, a
+stability-only alternative was tested to determine whether high agreement
+between adjacent consolidation thresholds was sufficient to prevent a
+collapsed partition.
+
+\subsubsection{Perturbation response and repeatability}
+
+Perturbation experiments were conducted on Salinas-A, Indian Pines, and Pavia
+University. Two independently seeded trials were performed for additive noise
+at the frozen strength of 0.01 and for random pixel replacement at the frozen
+fraction of 0.05. The same preprocessing, graph, diffusion, and consolidation
+procedure was rerun on each perturbed scene.
+
+Salinas-A and Indian Pines were initially assessed using their frozen original
+consolidation thresholds. For Pavia University, the full partition-based endpoint
+rule was rerun for every perturbation because retaining the original threshold
+could create a collapse that the adaptive selector would not accept. The
+Pavia analysis therefore recorded whether the selector returned a valid
+endpoint, retained the conservative candidate, or abstained.
+
+Perturbed partitions were compared with the corresponding frozen partition
+using ARI over all scene pixels and, separately, over the labelled support.
+Reference-based OA, BA, NMI, and ARI were also calculated after the perturbed
+partition had been selected. This separated partition repeatability from
+semantic agreement with the reference map.
+
+Cross-device repeatability was examined on KSC, WHU-Hi HanChuan, and Botswana.
+The frozen CPU partition was compared with a new GPU execution using full-scene
+and labelled-support ARI. Region counts were reported alongside these
+agreements because two highly similar partitions can still differ in the
+number of small regions. The assessment therefore concerned partition-level
+repeatability rather than bitwise identity.
+
+\subsubsection{Computational complexity}
+
+Let \(N\) denote the number of pixels, \(B\) the number of spectral bands,
+\(E\) the number of retained graph edges, and \(T\) the diffusion checkpoint.
+The local graph examines at most \(w=15^{2}-1\) spatial candidates per pixel
+and retains \(k=20\) neighbours. Candidate ranking in the 20-dimensional
+search representation therefore requires
+
+\begin{equation}
+O\!\left(Nwd_s\right),
+\qquad d_s=20,
+\end{equation}
+
+while full-spectrum edge weighting requires \(O(EB)\). Since the fixed-degree
+construction gives \(E=O(Nk)\), the graph remains sparse.
+
+Each diffusion update multiplies the sparse transition matrix by the
+\(N\times B\) spectral representation and therefore costs \(O(EB)\). The full
+diffusion stage has complexity
+
+\begin{equation}
+O\!\left(TEB\right)
+=
+O\!\left(TNkB\right).
+\label{eq:diffusion_complexity}
+\end{equation}
+
+The fine-mode graph retains at most \(q=50\) candidate neighbours per pixel.
+After neighbour identification, radius filtering, connected-component
+extraction, and spatial cleanup require \(O(Nq)\) time. Forming the initial
+region prototypes costs \(O(Nd_f)\), where \(d_f\leq10\).
+
+Let \(M\) denote the number of current prototypes, \(p=30\) the retained
+prototype-neighbour count, and \(R\) the number of consolidation rounds.
+Reciprocal checking and prototype updates require
+\(O(RMpd_f)\). Exact prototype-neighbour search has a worst-case cost of
+\(O(RM^{2}d_f)\), making prototype search the main non-linear term when the
+fine partition contains many regions. The PCA decomposition cost depends on
+the numerical solver; projection onto a fixed \(d\)-dimensional representation
+requires \(O(NBd)\).
+
+The principal memory requirement is
+
+\begin{equation}
+O\!\left(NB+E+Nq+Md_f\right),
+\label{eq:memory_complexity}
+\end{equation}
+
+covering the spectral representation, sparse graph, capped fine-neighbour
+graph, and region prototypes. With fixed neighbourhood caps and
+\(M\ll N\), graph construction and diffusion scale approximately linearly with
+the number of pixels, while prototype search becomes important when the fine
+partition is highly fragmented.
+
+\subsubsection{Fragmentation and cluster-count controls}
+
+Several diagnostics were used to determine whether high information-based
+agreement arose only from producing many regions. First, the final Graph-RMS
+partitions were rescored using AMI, homogeneity, completeness, and V-measure.
+The difference between NMI and AMI measured the effect of chance correction,
+while the homogeneity--completeness balance showed whether the output consisted
+mainly of pure but fragmented semantic classes.
+
+Second, a post hoc oracle-\(K\) diagnostic examined how the metrics changed
+when the Graph-RMS partition was consolidated to the reference class count.
+This experiment used \(K\) only after the partition had been frozen
+and was not part of the proposed operating protocol.
+
+Third, MiniBatch-KMeans was evaluated with the same nominal number of clusters
+as Graph-RMS. The primary control used
+\(\widehat{M}_{\mathrm{full}}\), the number of regions in the complete frozen
+Graph-RMS partition. A secondary diagnostic used
+\(\widehat{M}_{\Omega}\), the number of Graph-RMS regions intersecting the
+reference support. Both controls used standardised PCA-20 features and five
+fixed seeds. The labelled-support budget was treated only as a diagnostic
+because it depends on the geometry of the reference mask, even though it does
+not use the class identities.
+
+\subsubsection{Runtime and memory profiling}
+
+End-to-end Graph-RMS runtime and memory use were profiled on all nine scenes.
+Each scene was executed three times on an NVIDIA A100 GPU. The recorded runtime
+included data preparation, graph construction, affinity calculation, diffusion,
+fine-mode extraction, spatial cleanup, prototype consolidation, and endpoint
+selection.
+
+Peak process resident-set size, peak allocated GPU memory, and peak reserved
+GPU memory were stored separately. The main manuscript reports process memory
+and allocated GPU memory because reserved memory includes allocator capacity
+that may not be occupied by active tensors.
+
+An empirical relation between runtime and full-scene pixel count was estimated
+from the nine profiled scenes. This fitted trend was treated as a descriptive
+scaling summary rather than a formal complexity bound because band count,
+graph density, diffusion checkpoint, image geometry, and consolidation
+behaviour also differed across scenes.
+
+\FloatBarrier
+%==============================================================================
+% 3. Results
+%==============================================================================
+\section{Results}
+\label{sec:results}
+
+%==============================================================================
+% 3.1 Full-scene performance and classical comparison
+%==============================================================================
+%==============================================================================
+% 3.1 Full-scene performance and classical comparison
+%==============================================================================
+\subsection{Full-scene performance and classical comparison}
+\label{subsec:overall_results}
+
+Graph-RMS returned a full-scene partition for each of the nine datasets without
+receiving the reference class count. Its nine-scene mean NMI and ARI were
+0.7245 and 0.6086, respectively. The corresponding one-to-one Hungarian mean
+OA and BA were 0.6358 and 0.5319. NMI ranged from 0.5885 on Indian Pines to
+0.8659 on Salinas-A, while ARI ranged from 0.3022 on Indian Pines to 0.9447
+on Trento.
+
+The number of discovered regions varied more widely than the reference class
+count (Table~\ref{tab:primary_results}). Salinas-A produced seven full-scene
+regions, six of which intersected the reference mask. KSC produced 720 regions
+over the complete image, but only 31 intersected labelled pixels. The
+difference is especially relevant for KSC and Botswana, where the reference
+masks cover only 1.66\% and 0.86\% of the complete scenes.
+
+\begin{table}[!t]
+\centering
+\small
+\caption{Frozen Graph-RMS results on the nine complete hyperspectral scenes.
+\(M_{\mathrm{full}}\) is the number of regions in the complete partition and
+\(M_{\Omega}\) is the number intersecting the labelled evaluation support.
+OA and BA use one-to-one Hungarian alignment. Trento was the independent
+holdout for the primary procedure.}
+\label{tab:primary_results}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{4.5pt}
+
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Dataset &
+\(M_{\mathrm{full}}\) &
+\(M_{\Omega}\) &
+OA &
+BA &
+NMI &
+ARI \\
+\midrule
+Salinas-A          & 7   & 6  & 0.8057 & 0.7475 & 0.8659 & 0.7495 \\
+Indian Pines       & 35  & 33 & 0.4181 & 0.4956 & 0.5885 & 0.3022 \\
+KSC                & 720 & 31 & 0.4642 & 0.3755 & 0.6306 & 0.3226 \\
+Pavia University   & 207 & 76 & 0.6365 & 0.5009 & 0.6836 & 0.5137 \\
+WHU-Hi LongKou     & 110 & 77 & 0.8110 & 0.5497 & 0.8079 & 0.8261 \\
+WHU-Hi HongHu      & 46  & 46 & 0.7704 & 0.6198 & 0.7649 & 0.8586 \\
+WHU-Hi HanChuan    & 83  & 79 & 0.5130 & 0.3828 & 0.6134 & 0.6365 \\
+Botswana           & 38  & 21 & 0.4498 & 0.4381 & 0.7166 & 0.3234 \\
+Trento             & 68  & 41 & 0.8533 & 0.6774 & 0.8495 & 0.9447 \\
+\midrule
+Nine-scene mean    & --  & -- & 0.6358 & 0.5319 & 0.7245 & 0.6086 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:classical_complete} gives the complete comparison with the four
+classical methods supplied with the reference value of \(K\). Graph-RMS
+obtained the highest OA on six scenes and the highest NMI on all nine. The BA
+results were more mixed: Graph-RMS led on Indian Pines, HongHu, HanChuan, and
+Trento, while the classical methods led on the remaining scenes. Graph-RMS
+also had the highest ARI on six datasets.
+
+\begin{table}[!t]
+\centering
+\scriptsize
+\caption{Complete comparison with classical clustering methods supplied with
+the reference class count. Values for PCA-KMeans, MiniBatch-KMeans, FCM, and
+SLIC-KMeans are five-seed means. The best value within each dataset and metric
+is shown in bold. PCA-KM denotes PCA-KMeans and MB-KM denotes
+MiniBatch-KMeans.}
+\label{tab:classical_complete}
+
+\renewcommand{\arraystretch}{0.92}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Dataset & Method & OA & BA & NMI & ARI \\
+\midrule
+
+\multirow{5}{*}{Salinas-A}
+& Graph-RMS & 0.8057 & 0.7475 & \textbf{0.8659} & 0.7495 \\
+& PCA-KM    & 0.7704 & 0.7543 & 0.7695 & 0.6912 \\
+& MB-KM     & 0.8001 & 0.8370 & 0.7862 & 0.7076 \\
+& FCM       & \textbf{0.8410} & 0.8683 & 0.7828 & 0.7298 \\
+& SLIC-KM   & 0.8267 & \textbf{0.8798} & 0.8523 & \textbf{0.7708} \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{Indian Pines}
+& Graph-RMS & \textbf{0.4181} & \textbf{0.4956} & \textbf{0.5885} & \textbf{0.3022} \\
+& PCA-KM    & 0.3745 & 0.4076 & 0.4470 & 0.2258 \\
+& MB-KM     & 0.3608 & 0.3649 & 0.4314 & 0.2129 \\
+& FCM       & 0.3182 & 0.3315 & 0.4060 & 0.1826 \\
+& SLIC-KM   & 0.4044 & 0.3954 & 0.4814 & 0.2307 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{KSC}
+& Graph-RMS & 0.4642 & 0.3755 & \textbf{0.6306} & 0.3226 \\
+& PCA-KM    & 0.4150 & 0.2544 & 0.4743 & 0.2544 \\
+& MB-KM     & 0.4695 & 0.3649 & 0.5335 & 0.3677 \\
+& FCM       & \textbf{0.5244} & \textbf{0.4094} & 0.5752 & \textbf{0.4404} \\
+& SLIC-KM   & 0.4139 & 0.3251 & 0.5482 & 0.3226 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{Pavia University}
+& Graph-RMS & \textbf{0.6365} & 0.5009 & \textbf{0.6836} & \textbf{0.5137} \\
+& PCA-KM    & 0.5655 & \textbf{0.5679} & 0.5566 & 0.3560 \\
+& MB-KM     & 0.5530 & 0.5518 & 0.5460 & 0.3387 \\
+& FCM       & 0.5184 & 0.5446 & 0.5348 & 0.3066 \\
+& SLIC-KM   & 0.4808 & 0.4772 & 0.4803 & 0.2837 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{WHU-Hi LongKou}
+& Graph-RMS & \textbf{0.8110} & 0.5497 & \textbf{0.8079} & \textbf{0.8261} \\
+& PCA-KM    & 0.6987 & 0.5086 & 0.6528 & 0.6931 \\
+& MB-KM     & 0.6961 & 0.5454 & 0.6512 & 0.6912 \\
+& FCM       & 0.6095 & 0.5101 & 0.6238 & 0.5930 \\
+& SLIC-KM   & 0.7479 & \textbf{0.5807} & 0.7133 & 0.7446 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{WHU-Hi HongHu}
+& Graph-RMS & \textbf{0.7704} & \textbf{0.6198} & \textbf{0.7649} & \textbf{0.8586} \\
+& PCA-KM    & 0.3414 & 0.3449 & 0.4443 & 0.2124 \\
+& MB-KM     & 0.3260 & 0.3329 & 0.4378 & 0.2084 \\
+& FCM       & 0.2782 & 0.3157 & 0.4207 & 0.1660 \\
+& SLIC-KM   & 0.3523 & 0.3888 & 0.5058 & 0.2377 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{WHU-Hi HanChuan}
+& Graph-RMS & \textbf{0.5130} & \textbf{0.3828} & \textbf{0.6134} & \textbf{0.6365} \\
+& PCA-KM    & 0.4167 & 0.2979 & 0.4105 & 0.3349 \\
+& MB-KM     & 0.4276 & 0.3114 & 0.4361 & 0.3873 \\
+& FCM       & 0.4122 & 0.3306 & 0.4366 & 0.3927 \\
+& SLIC-KM   & 0.4384 & 0.3107 & 0.4308 & 0.3545 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{Botswana}
+& Graph-RMS & 0.4498 & 0.4381 & \textbf{0.7166} & 0.3234 \\
+& PCA-KM    & 0.5748 & 0.5740 & 0.6052 & 0.3963 \\
+& MB-KM     & 0.5097 & 0.5235 & 0.5860 & 0.3666 \\
+& FCM       & 0.4745 & 0.4790 & 0.5490 & 0.3321 \\
+& SLIC-KM   & \textbf{0.6206} & \textbf{0.6292} & 0.7092 & \textbf{0.5043} \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{Trento}
+& Graph-RMS & \textbf{0.8533} & \textbf{0.6774} & \textbf{0.8495} & \textbf{0.9447} \\
+& PCA-KM    & 0.6451 & 0.5697 & 0.4943 & 0.3636 \\
+& MB-KM     & 0.5991 & 0.5289 & 0.4777 & 0.3375 \\
+& FCM       & 0.5362 & 0.4972 & 0.4652 & 0.3133 \\
+& SLIC-KM   & 0.7816 & 0.5867 & 0.6334 & 0.6830 \\
+\midrule
+
+\multirow{5}{*}{Mean}
+& Graph-RMS & \textbf{0.6358} & \textbf{0.5319} & \textbf{0.7245} & \textbf{0.6086} \\
+& PCA-KM    & 0.5336 & 0.4755 & 0.5394 & 0.3920 \\
+& MB-KM     & 0.5269 & 0.4845 & 0.5429 & 0.4020 \\
+& FCM       & 0.5014 & 0.4763 & 0.5327 & 0.3840 \\
+& SLIC-KM   & 0.5629 & 0.5082 & 0.5950 & 0.4591 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The average-rank analysis followed the same pattern
+(Table~\ref{tab:classical_statistics}). Graph-RMS had the lowest average rank
+for each metric and a rank of 1.000 for NMI. The Friedman \(p\)-values were
+0.000205 for NMI and 0.0460 for ARI, compared with 0.0639 for OA and 0.5394
+for BA. Given the nine-scene sample, these tests were used to summarise the
+cross-scene ranking pattern rather than as the primary evidence for method
+performance.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Supporting rank and statistical summary for the classical
+five-method comparison. Panel A reports average ranks and Friedman tests;
+lower rank is better.
+Panel B reports Holm-adjusted \(p\)-values for paired comparisons between
+Graph-RMS and each classical baseline.}
+\label{tab:classical_statistics}
+
+\renewcommand{\arraystretch}{1.02}
+\setlength{\tabcolsep}{4.2pt}
+
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+\multicolumn{8}{@{}l}{\textit{Panel A: Average ranks and Friedman tests}} \\
+\addlinespace[2pt]
+Metric &
+Graph-RMS &
+PCA-KM &
+MB-KM &
+FCM &
+SLIC-KM &
+\(\chi^{2}_{F}\) &
+\(p\)-value \\
+\midrule
+OA  & \textbf{1.8889} & 3.2222 & 3.4444 & 3.8889 & 2.5556 & 8.8889  & 0.0639 \\
+BA  & \textbf{2.4444} & 3.3333 & 3.2222 & 3.4444 & 2.5556 & 3.1111  & 0.5394 \\
+NMI & \textbf{1.0000} & 3.5556 & 3.6667 & 4.1111 & 2.6667 & 21.9556 & 0.000205 \\
+ARI & \textbf{1.7778} & 3.4444 & 3.4444 & 3.7778 & 2.5556 & 9.6889  & 0.0460 \\
+\midrule
+
+\multicolumn{8}{@{}l}{\textit{Panel B: Holm-adjusted paired \(p\)-values}} \\
+\addlinespace[2pt]
+Metric &
+PCA-KM &
+MB-KM &
+FCM &
+SLIC-KM &
+\multicolumn{3}{c}{} \\
+\midrule
+OA  & 0.5195 & 0.3906 & 0.4375 & 0.8203 & \multicolumn{3}{c}{} \\
+BA  & 1.0000 & 1.0000 & 1.0000 & 1.0000 & \multicolumn{3}{c}{} \\
+NMI & 0.0625 & 0.0625 & 0.0625 & 0.0625 & \multicolumn{3}{c}{} \\
+ARI & 0.2344 & 0.3906 & 0.3008 & 0.5195 & \multicolumn{3}{c}{} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Graph-RMS ranked first for NMI on all nine scenes and had the lowest average
+rank for each of the four metrics. None of the 16
+Graph-RMS-versus-baseline pairwise comparisons remained significant after Holm
+correction. The cross-scene tests are therefore treated as supporting
+summaries of the observed ranking pattern rather than as evidence of pairwise
+statistical superiority.
+
+The Trento result is examined separately in
+Section~\ref{subsec:trento_results} because that scene was not used during
+method development.
+
+%==============================================================================
+% 3.2 Comparison with class-count-free methods
+%==============================================================================
+\subsection{Comparison with class-count-free methods}
+\label{subsec:no_k_results}
+
+The class-count-free comparison produced two different outcomes. Leiden
+remained competitive when applied to the same weighted graph as Graph-RMS,
+whereas the fixed-default HDBSCAN configuration produced lower
+agreement on most scenes. Table~\ref{tab:no_k_complete} reports the absolute
+metric values so that both patterns can be inspected directly.
+
+\begin{table}[!t]
+\centering
+\scriptsize
+\caption{Complete comparison of the class-count-free methods. Leiden values
+are five-seed means. Graph-RMS and HDBSCAN each contributed one frozen result
+under the declared protocol. The best value within each dataset and metric is
+shown in bold.}
+\label{tab:no_k_complete}
+
+\renewcommand{\arraystretch}{0.94}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Dataset & Method & OA & BA & NMI & ARI \\
+\midrule
+
+\multirow{3}{*}{Salinas-A}
+& Graph-RMS & 0.8057 & 0.7475 & 0.8659 & 0.7495 \\
+& Leiden    & \textbf{0.8740} & \textbf{0.9010} & \textbf{0.9177} & \textbf{0.8738} \\
+& HDBSCAN   & 0.4215 & 0.4420 & 0.5231 & 0.2345 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{Indian Pines}
+& Graph-RMS & \textbf{0.4181} & 0.4956 & 0.5885 & \textbf{0.3022} \\
+& Leiden    & 0.3866 & \textbf{0.6102} & \textbf{0.6960} & 0.2928 \\
+& HDBSCAN   & 0.2410 & 0.0727 & 0.0061 & 0.0012 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{KSC}
+& Graph-RMS & 0.4642 & 0.3755 & 0.6306 & 0.3226 \\
+& Leiden    & \textbf{0.5426} & \textbf{0.6079} & \textbf{0.7709} & \textbf{0.5091} \\
+& HDBSCAN   & 0.1357 & 0.0813 & 0.2856 & -0.0040 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{Pavia University}
+& Graph-RMS & \textbf{0.6365} & \textbf{0.5009} & \textbf{0.6836} & \textbf{0.5137} \\
+& Leiden    & 0.4365 & 0.4268 & 0.6615 & 0.3710 \\
+& HDBSCAN   & 0.4360 & 0.1112 & 0.0002 & 0.0001 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{WHU-Hi LongKou}
+& Graph-RMS & \textbf{0.8110} & 0.5497 & \textbf{0.8079} & \textbf{0.8261} \\
+& Leiden    & 0.3626 & \textbf{0.5921} & 0.6698 & 0.2931 \\
+& HDBSCAN   & 0.3283 & 0.1125 & 0.0032 & 0.0010 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{WHU-Hi HongHu}
+& Graph-RMS & \textbf{0.7704} & \textbf{0.6198} & \textbf{0.7649} & \textbf{0.8586} \\
+& Leiden    & 0.3651 & 0.5298 & 0.6153 & 0.1771 \\
+& HDBSCAN   & 0.4240 & 0.0495 & 0.0064 & 0.0026 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{WHU-Hi HanChuan}
+& Graph-RMS & \textbf{0.5130} & 0.3828 & 0.6134 & \textbf{0.6365} \\
+& Leiden    & 0.3928 & \textbf{0.4654} & \textbf{0.6595} & 0.3854 \\
+& HDBSCAN   & 0.2938 & 0.0759 & 0.0099 & 0.0014 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{Botswana}
+& Graph-RMS & 0.4498 & 0.4381 & 0.7166 & 0.3234 \\
+& Leiden    & \textbf{0.4575} & \textbf{0.4466} & \textbf{0.7658} & \textbf{0.4960} \\
+& HDBSCAN   & 0.1087 & 0.1008 & 0.0407 & 0.0040 \\
+\addlinespace[2pt]
+
+\multirow{3}{*}{Trento}
+& Graph-RMS & \textbf{0.8533} & \textbf{0.6774} & \textbf{0.8495} & \textbf{0.9447} \\
+& Leiden    & 0.6321 & 0.5526 & 0.7617 & 0.7179 \\
+& HDBSCAN   & 0.4015 & 0.2736 & 0.2024 & 0.0977 \\
+\midrule
+
+\multirow{3}{*}{Mean}
+& Graph-RMS & \textbf{0.6358} & 0.5319 & \textbf{0.7245} & \textbf{0.6086} \\
+& Leiden    & 0.4944 & \textbf{0.5703} & 0.7242 & 0.4574 \\
+& HDBSCAN   & 0.3100 & 0.1466 & 0.1197 & 0.0376 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Graph-RMS and Leiden had nearly identical mean NMI values, differing by less
+than 0.001. Graph-RMS had higher mean OA and ARI, whereas Leiden had higher
+mean BA. The scene-level pattern was more informative than the aggregate mean.
+Leiden led on all four metrics for Salinas-A, KSC, and Botswana, while
+Graph-RMS led on all four for Pavia University, HongHu, and Trento.
+
+The magnitude of the differences also varied substantially by scene. Relative
+to Leiden, Graph-RMS increased OA by 0.4484 and ARI by 0.5330 on LongKou,
+OA by 0.4053 and ARI by 0.6815 on HongHu, and OA by 0.2212 and ARI by
+0.2268 on Trento. Other scenes favoured Leiden. The post-graph stages
+therefore changed the resulting partition materially on several datasets
+rather than simply reproducing direct community detection.
+
+None of the paired Graph-RMS--Leiden differences was statistically significant
+(Table~\ref{tab:no_k_statistics}). The comparison does not establish a
+uniform accuracy advantage for either method. Instead, it shows that the
+shared graph contains substantial scene structure, while the subsequent
+Graph-RMS diffusion, fine-mode formation, consolidation, and endpoint
+selection can produce a different operating point with large gains on some
+scenes and losses on others.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Scene-level summary of the class-count-free comparisons. A win denotes
+a scene on which Graph-RMS obtained the higher metric value. The reported
+\(p\)-values are from exact two-sided paired Wilcoxon tests over the nine
+scenes.}
+\label{tab:no_k_statistics}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Comparator & Quantity & OA & BA & NMI & ARI \\
+\midrule
+\multirow{2}{*}{Leiden}
+& Graph-RMS wins & 6/9 & 3/9 & 4/9 & 6/9 \\
+& \(p\)-value    & 0.0977 & 0.4258 & 1.0000 & 0.2031 \\
+\addlinespace[2pt]
+\multirow{2}{*}{HDBSCAN}
+& Graph-RMS wins & 9/9 & 9/9 & 9/9 & 9/9 \\
+& \(p\)-value    & 0.003906 & 0.003906 & 0.003906 & 0.003906 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Graph-RMS exceeded fixed-default HDBSCAN on all 36 matched scene--metric
+comparisons. Under that configuration, HDBSCAN produced only three full-scene
+labels on Indian Pines and four on Pavia University. It also assigned 70.0\%
+of KSC and 92.4\% of Trento to noise. These results explain the weak agreement
+on several scenes, but they apply only to the declared fixed-default HDBSCAN
+protocol and not to every possible scene-specific configuration.
+%==============================================================================
+% 3.3 Holdout performance on Trento
+%==============================================================================
+%==============================================================================
+% 3.3 Holdout performance on Trento
+%==============================================================================
+\subsection{Holdout performance on Trento}
+\label{subsec:trento_results}
+
+Trento was processed after the operating procedure and endpoint rule had been
+fixed on the eight development scenes. Its reference map and semantic class
+count were not used to revise the method or its held-out configuration. The
+holdout run used \(T=100\), \(r_f=0.20\), and \(\tau=0.75\). The partition-based selector
+accepted the size-aware branch with \(\beta=0.5\).
+
+The diffused representation produced 213 fine regions. Spatial refinement and
+reciprocal prototype consolidation reduced this partition to 68 full-scene
+regions, of which 41 intersected the labelled evaluation support. The complete
+holdout configuration and selected output are summarised in
+Table~\ref{tab:trento_configuration}.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Frozen configuration and selected Graph-RMS output for the
+independent Trento holdout in the primary experiment.}
+\label{tab:trento_configuration}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+\(T\) &
+\(r_f\) &
+\(\tau\) &
+\(\beta\) &
+Fine regions &
+\(M_{\mathrm{full}}\) &
+\(M_{\Omega}\) \\
+\midrule
+100 & 0.20 & 0.75 & 0.5 & 213 & 68 & 41 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Graph-RMS attained an NMI of 0.8495 and ARI of 0.9447. Under one-to-one
+Hungarian alignment, the corresponding OA and BA were 0.8533 and 0.6774
+(Table~\ref{tab:trento_comparison}). Spatial block bootstrapping gave
+comparatively narrow intervals for all four measures, with the strongest
+agreement observed for ARI.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Performance on the independent Trento holdout for the primary
+Graph-RMS procedure. Graph-RMS intervals are
+95\% spatial block-bootstrap intervals from 300 replicates with a block size
+of 16 pixels. SLIC-KMeans was the strongest classical method on Trento.
+Leiden values are five-seed means, and HDBSCAN used the declared fixed-default
+configuration.}
+\label{tab:trento_comparison}
+
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Method or summary & OA & BA & NMI & ARI \\
+\midrule
+\textbf{Graph-RMS}
+& \textbf{0.8533}
+& \textbf{0.6774}
+& \textbf{0.8495}
+& \textbf{0.9447} \\
+
+95\% bootstrap interval
+& [0.8219, 0.8949]
+& [0.6452, 0.7383]
+& [0.8288, 0.8826]
+& [0.9135, 0.9664] \\
+
+SLIC-KMeans
+& 0.7816
+& 0.5867
+& 0.6334
+& 0.6830 \\
+
+Leiden
+& 0.6321
+& 0.5526
+& 0.7617
+& 0.7179 \\
+
+HDBSCAN
+& 0.4015
+& 0.2736
+& 0.2024
+& 0.0977 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Relative to SLIC-KMeans, Graph-RMS improved OA by 0.0717, BA by 0.0907,
+NMI by 0.2161, and ARI by 0.2617. It also exceeded both class-count-free
+comparators on the holdout. Trento had not been used to revise the primary procedure before this
+evaluation.
+
+The information-based diagnostics in Table~\ref{tab:trento_diagnostics}
+clarify the structure of the selected partition. Homogeneity and purity were
+high, indicating that individual regions were usually dominated by one
+reference category. Completeness was lower because several reference
+categories were represented by more than one discovered region.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Structural and information-based diagnostics for the selected Trento
+partition. The final two quantities describe how many discovered regions were
+needed to account for 90\% of a reference class.}
+\label{tab:trento_diagnostics}
+
+\renewcommand{\arraystretch}{1.07}
+\setlength{\tabcolsep}{7pt}
+
+\begin{tabular}{@{}lr@{}}
+\toprule
+Diagnostic & Value \\
+\midrule
+Adjusted mutual information & 0.8492 \\
+Homogeneity & 0.9636 \\
+Completeness & 0.7596 \\
+Many-to-one purity & 0.9877 \\
+Mean regions covering 90\% of a class & 4.67 \\
+Maximum regions covering 90\% of a class & 11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The contrast between high homogeneity and lower completeness is consistent
+with a fine structural partition rather than a direct reconstruction of the
+six-class reference legend. The relation between structural regions and
+semantic classes is examined across all nine scenes in the next subsection.
+
+
+%==============================================================================
+% 3.4 Structural granularity and semantic correspondence
+%==============================================================================
+\subsection{Structural granularity and semantic correspondence}
+\label{subsec:fragmentation_results}
+
+Graph-RMS did not constrain the number of discovered regions to match the
+number of reference classes. The selected full-scene granularity ranged from
+seven regions on Salinas-A to 720 on KSC. This variation reflects both scene
+structure and the fact that Graph-RMS processed unlabelled areas outside the
+reference masks.
+
+Figure~\ref{fig:representative_maps} shows three representative outcomes. On
+KSC, the reference labels are sparse and spatially discontinuous, so many
+full-scene regions do not appear within the evaluation mask. HongHu contains
+larger labelled areas and shows closer spatial correspondence, although some
+fields are divided into finer regions. Trento preserves the main reference
+structures while retaining subdivisions within several semantic categories.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[
+    width=0.68\textwidth,
+    height=0.36\textheight,
+    keepaspectratio
+]{figures/fig2_representative_cluster_maps.png}
+\caption{Representative Graph-RMS partitions and reference maps for KSC,
+WHU-Hi HongHu, and Trento. Region identifiers were aligned with reference
+classes only for display and evaluation. Black pixels have no reference label,
+while grey pixels belong to regions that remained unmatched under the
+one-to-one Hungarian assignment. This alignment was not used during graph
+construction, diffusion, consolidation, or endpoint selection.}
+\label{fig:representative_maps}
+\end{figure}
+
+Table~\ref{tab:region_granularity} distinguishes the number of regions in the
+complete image from the number intersecting the labelled support. The
+difference is largest for KSC: its 720 full-scene regions correspond to 55.38
+regions per reference class, but only 31 regions intersect the reference mask,
+giving a labelled-support ratio of 2.38. Botswana shows a smaller version of
+the same pattern.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Structural granularity of the selected Graph-RMS partitions.
+\(K\) is the reference class count, \(M_{\mathrm{full}}\) is the complete
+full-scene region count, and \(M_{\Omega}\) is the number of regions
+intersecting the labelled support. The ratios are descriptive and were not
+used during endpoint selection.}
+\label{tab:region_granularity}
+
+\renewcommand{\arraystretch}{1.04}
+\setlength{\tabcolsep}{4.5pt}
+
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Dataset &
+\(K\) &
+\(M_{\mathrm{full}}\) &
+\(M_{\Omega}\) &
+\(M_{\mathrm{full}}/K\) &
+\(M_{\Omega}/K\) \\
+\midrule
+Salinas-A        & 6  & 7   & 6  & 1.17  & 1.00 \\
+Indian Pines     & 16 & 35  & 33 & 2.19  & 2.06 \\
+KSC              & 13 & 720 & 31 & 55.38 & 2.38 \\
+Pavia University & 9  & 207 & 76 & 23.00 & 8.44 \\
+WHU-Hi LongKou   & 9  & 110 & 77 & 12.22 & 8.56 \\
+WHU-Hi HongHu    & 22 & 46  & 46 & 2.09  & 2.09 \\
+WHU-Hi HanChuan  & 16 & 83  & 79 & 5.19  & 4.94 \\
+Botswana         & 14 & 38  & 21 & 2.71  & 1.50 \\
+Trento           & 6  & 68  & 41 & 11.33 & 6.83 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Pavia University, LongKou, and Trento retained the finest structure within
+their labelled areas, with \(M_{\Omega}/K\) values of 8.44, 8.56, and 6.83,
+respectively. Salinas-A was the closest to a one-region-per-class result, with
+six label-intersecting regions for six reference classes.
+
+Figure~\ref{fig:fragmentation} relates these region counts to the difference
+between many-to-one purity and one-to-one OA. The latter penalises a partition
+when several predicted regions correspond to the same reference class, even
+when each individual region is internally consistent.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[
+    width=0.76\textwidth,
+    height=0.34\textheight,
+    keepaspectratio
+]{figures/fig3_fragmentation.png}
+\caption{Structural granularity and semantic fragmentation across the nine
+scenes. The upper panel compares full-scene and labelled-support region counts
+with the reference class count on a logarithmic scale. The lower panel shows
+the difference between many-to-one purity and one-to-one Hungarian OA. A
+larger difference indicates that several class-consistent regions correspond
+to the same reference category.}
+\label{fig:fragmentation}
+\end{figure}
+
+Many-to-one purity was consistently higher than one-to-one OA. On Trento,
+purity was 0.9877, compared with an OA of 0.8533. Indian Pines and HanChuan
+showed the largest purity--OA differences, at 0.2655 and 0.2543,
+respectively. Their mean numbers of regions needed to cover 90\% of a
+reference class were 3.13 and 6.38. Pavia University required a mean of 4.56
+regions, with a maximum of 19 for one reference category. These results show
+that the one-to-one accuracy penalty arose mainly from semantic classes being
+divided into several regions.
+
+Two controls examined whether the strong information-based scores could be
+explained only by the number of discovered regions
+(Table~\ref{tab:granularity_controls}). First, MiniBatch-KMeans was rerun using
+the Graph-RMS full-scene region count as its requested number of clusters.
+Graph-RMS retained higher OA and NMI on all nine scenes, higher BA on seven,
+and higher ARI on eight. Second, the frozen Trento partition was consolidated
+post hoc to the six reference classes. This reduced all four primary metrics.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Controls for region-count and semantic-fragmentation effects.
+Panel A compares the selected Trento partition with a post hoc six-region
+version and a count-matched MiniBatch-KMeans result. Dashes indicate metrics
+not included in the stored count-matched summary. Panel B gives the number of
+scenes on which Graph-RMS exceeded count-matched MiniBatch-KMeans.}
+\label{tab:granularity_controls}
+
+\renewcommand{\arraystretch}{1.06}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\multicolumn{5}{@{}l}{\textit{Panel A: Trento controls}} \\
+\addlinespace[2pt]
+Partition or control & OA & BA & NMI & ARI \\
+\midrule
+Selected Graph-RMS
+& 0.8533 & 0.6774 & 0.8495 & 0.9447 \\
+
+Graph-RMS consolidated to \(K=6\)
+& 0.7916 & 0.5691 & 0.7611 & 0.7267 \\
+
+Count-matched MiniBatch-KMeans
+& -- & -- & 0.4108 & 0.0974 \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textit{Panel B: Graph-RMS wins over count-matched
+MiniBatch-KMeans}} \\
+\addlinespace[2pt]
+Comparison & OA & BA & NMI & ARI \\
+\midrule
+Scenes won & 9/9 & 7/9 & 9/9 & 8/9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The decrease after forcing Trento to six regions indicates that the selected
+partition retained spectral--spatial distinctions that were lost under direct
+compression to the semantic class count. Similarly, the count-matched
+MiniBatch-KMeans control shows that a large region count alone does not account
+for the observed NMI and ARI.
+
+The Graph-RMS region count should therefore be read as the granularity of the
+discovered spectral--spatial structure. It is not an estimate of the number of
+thematic classes in the reference map.
+%==============================================================================
+% 3.5 Component ablation
+%==============================================================================
+%==============================================================================
+% 3.5 Component ablation
+%==============================================================================
+\subsection{Component ablation}
+\label{subsec:ablation_results}
+
+The Pavia University ablation examined how each stage affected the scale and
+reference agreement of the final partition. Each variant changed one part of
+the frozen Graph-RMS procedure while retaining the remaining settings. The
+complete method produced 207 full-scene regions, with an OA of 0.6365, BA of
+0.5009, NMI of 0.6836, and ARI of 0.5137
+(Table~\ref{tab:ablation}).
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Component ablation on Pavia University. The region count refers to
+the complete scene. Each variant changed one component of the frozen
+Graph-RMS procedure. The highest value in each metric column is shown in
+bold.}
+\label{tab:ablation}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{4.2pt}
+
+\begin{tabularx}{\textwidth}{@{}Xrrrrr@{}}
+\toprule
+Configuration & Regions & OA & BA & NMI & ARI \\
+\midrule
+Complete Graph-RMS
+& 207
+& \textbf{0.6365}
+& 0.5009
+& \textbf{0.6836}
+& 0.5137 \\
+
+Without mutual-neighbour gate
+& 33
+& 0.6125
+& \textbf{0.6424}
+& 0.6374
+& 0.3495 \\
+
+Without spatial affinity
+& 1
+& 0.4360
+& 0.1111
+& 0.0000
+& 0.0000 \\
+
+Without diffusion (\(T=0\))
+& 7\,336
+& 0.0129
+& 0.0266
+& 0.2943
+& 0.0022 \\
+
+Without spatial cleanup
+& 2\,214
+& 0.6125
+& 0.4418
+& 0.6495
+& \textbf{0.5156} \\
+
+Without fine-mode grouping
+& 189\,178
+& 0.0022
+& 0.0050
+& 0.2863
+& 0.0001 \\
+
+Without prototype consolidation
+& 692
+& 0.6194
+& 0.4525
+& 0.6602
+& 0.5117 \\
+
+Without size weighting (\(\beta=0\))
+& 213
+& 0.5548
+& 0.5477
+& 0.5157
+& 0.2413 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The graph affinity and diffusion stages controlled opposite forms of
+degeneracy. Removing the spatial affinity connected the scene too broadly and
+left a single region, reducing NMI and ARI to zero. Removing diffusion
+preserved too much pixel-level variation: the partition expanded to 7\,336
+regions, with an OA of 0.0129 and an ARI of 0.0022. The later consolidation
+stages could not recover a useful partition from this fragmented
+representation.
+
+Fine-mode grouping had an even larger effect on granularity. Without it,
+189\,178 regions remained, and all four reference-based measures were low.
+Spatial cleanup reduced the number of isolated assignments from 2\,214 to 207
+after subsequent processing. Its removal caused only a small change in ARI
+but reduced OA, BA, and NMI. The complete method and the no-cleanup variant
+had ARI values of 0.5137 and 0.5156, respectively, showing that the cleanup
+stage primarily improved spatial regularity and one-to-one semantic agreement
+rather than every partition metric.
+
+Prototype consolidation reduced the cleaned fine partition from 692 to 207
+regions. Omitting consolidation produced moderate declines in OA, BA, and NMI,
+while ARI remained close to that of the complete method. The result suggests
+that many fine regions already followed useful structural boundaries, but
+consolidation produced a more manageable partition without discarding most of
+that agreement.
+
+The size adjustment affected which prototypes merged. Setting \(\beta=0\)
+retained a similar number of regions and increased BA from 0.5009 to 0.5477,
+but reduced OA from 0.6365 to 0.5548, NMI from 0.6836 to 0.5157, and ARI
+from 0.5137 to 0.2413. Removing the mutual-neighbour gate also increased BA,
+but reduced the other three metrics and compressed the scene to 33 regions.
+Neither modification was uniformly inferior, but both shifted the partition
+towards a different balance between class recall and structural agreement.
+
+On Pavia University, the ablation exposed two principal failure modes.
+Removing major graph, diffusion, or fine-mode operations led either to collapse
+or extensive fragmentation, while cleanup and prototype consolidation altered
+the scale of the retained regions. The complete configuration did not maximise
+every metric, but it avoided the degenerate outputs observed after removal of
+the major stages and retained the highest OA and NMI among the tested
+variants. Because the experiment used one diagnostic scene, these component
+effects should be interpreted as illustrative rather than exhaustive across
+all datasets.
+
+
+%==============================================================================
+% 3.6 Parameter sensitivity and endpoint-selector behaviour
+%==============================================================================
+\subsection{Parameter sensitivity and endpoint-selector behaviour}
+\label{subsec:sensitivity_results}
+
+The sensitivity analysis comprised 51 runs on Salinas-A, Indian Pines, and
+Pavia University. The spatial-window radius, PCA dimension used for neighbour
+ranking, diffusion checkpoint, and fine-mode radius were varied one at a time,
+with the remaining settings held at their frozen values. Figure
+\ref{fig:sensitivity} reports the corresponding OA and NMI values.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[
+    width=0.90\textwidth,
+    height=0.38\textheight,
+    keepaspectratio
+]{figures/fig4_sensitivity.png}
+\caption{Sensitivity of OA and NMI to the PCA search dimension, spatial-window
+radius, diffusion checkpoint, and fine-mode radius on Salinas-A, Indian Pines,
+and Pavia University. Each parameter was varied separately while the remaining
+settings were held fixed. Single-region outputs are retained in the figure
+rather than removed from the tested range.}
+\label{fig:sensitivity}
+\end{figure}
+
+The principal responses are summarised in
+Table~\ref{tab:sensitivity_summary}. The PCA search dimension produced the
+smallest changes on Salinas-A and Pavia University. Salinas-A retained seven
+regions across 10--40 components, with OA between 0.8057 and 0.8089 and NMI
+between 0.8649 and 0.8772. Pavia University retained 207--221 regions, with
+NMI between 0.6637 and 0.6836. Indian Pines was more sensitive: using ten
+components increased OA to 0.5678 and ARI to 0.4668, compared with frozen
+values of 0.4181 and 0.3022 at 20 components.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Summary of the main parameter-sensitivity responses. The table
+reports the most informative changes from the complete 51-run analysis;
+the full OA and NMI trajectories are shown in
+Fig.~\ref{fig:sensitivity}.}
+\label{tab:sensitivity_summary}
+
+\renewcommand{\arraystretch}{1.06}
+\setlength{\tabcolsep}{4pt}
+
+\begin{tabularx}{\textwidth}{@{}p{0.18\textwidth}
+p{0.16\textwidth}
+p{0.17\textwidth}
+X@{}}
+\toprule
+Parameter & Scene & Tested range & Main response \\
+\midrule
+
+PCA search dimension
+& Salinas-A
+& 10--40
+& Seven regions throughout; OA \(0.8057\)--\(0.8089\) and
+NMI \(0.8649\)--\(0.8772\). \\
+
+PCA search dimension
+& Indian Pines
+& 10--40
+& Ten components gave OA \(0.5678\) and ARI \(0.4668\), compared with
+the frozen OA \(0.4181\) and ARI \(0.3022\). \\
+
+PCA search dimension
+& Pavia University
+& 10--40
+& Region count \(207\)--\(221\); NMI \(0.6637\)--\(0.6836\). \\
+
+Spatial-window radius
+& Salinas-A
+& 3, 5, 7, 9
+& Radii 5, 7, and 9 all produced seven regions with similar agreement. \\
+
+Spatial-window radius
+& Indian Pines
+& 3, 5, 7, 9
+& Final region count varied from 30 to 87 without a single-region collapse. \\
+
+Spatial-window radius
+& Pavia University
+& 3, 5, 7, 9
+& Radius 5 produced the highest OA and NMI; radius 9 produced one region. \\
+
+Diffusion checkpoint
+& Salinas-A
+& 25, 50, 100, 200
+& Agreement improved from \(T=25\) to \(T=100\) and changed little at
+\(T=200\). \\
+
+Diffusion checkpoint
+& Indian Pines
+& 12, 25, 50, 100
+& OA was highest at \(T=25\); the frozen \(T=50\) retained the highest
+NMI among the longer checkpoints. \\
+
+Diffusion checkpoint
+& Pavia University
+& 25, 50, 100, 200
+& Checkpoints 25--100 produced 148--207 regions; \(T=200\) produced one
+region. \\
+
+Fine-mode radius
+& Salinas-A
+& 0.075--0.225
+& Results were comparatively stable apart from the lower response at
+\(r_f=0.1125\). \\
+
+Fine-mode radius
+& Indian Pines
+& 0.150--0.450
+& NMI declined from \(0.6102\) at \(r_f=0.225\) to \(0.4017\) at
+\(r_f=0.450\). \\
+
+Fine-mode radius
+& Pavia University
+& 0.075--0.225
+& Increasing \(r_f\) from 0.1875 to 0.225 changed the output from
+46 regions to one region. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The spatial window, diffusion checkpoint, and fine-mode radius had stronger
+scene-dependent effects than the PCA search dimension. Pavia University was
+the most susceptible to abrupt consolidation. A large spatial window, a long
+diffusion trajectory, or a sufficiently broad fine-mode radius could connect
+structures that remained separate under the frozen setting. Indian Pines
+changed more gradually, while Salinas-A remained stable over most of the
+tested range.
+
+The endpoint selector was examined separately from the parameter sweep. It
+returned a reported partition for all nine unperturbed scenes. The size-aware
+branch was accepted on eight scenes, while WHU-Hi LongKou used the conservative
+fallback. Relative to a retrospective metric-specific oracle over the stored
+candidate endpoints, the selector chose the highest-OA candidate on seven
+scenes. Pavia University, Botswana, and Trento matched the oracle endpoint for
+all four primary metrics.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Endpoint-selector audit. Panel A reports the mean difference between
+the selected endpoint and the retrospective best candidate for each metric.
+Panel B summarises the main rule-ablation outcomes. Reference metrics were
+used only after the partition-based endpoint had been selected.}
+\label{tab:selector_audit}
+
+\renewcommand{\arraystretch}{1.06}
+\setlength{\tabcolsep}{4.5pt}
+
+\begin{tabularx}{\textwidth}{@{}lrrrr@{}}
+\toprule
+\multicolumn{5}{@{}l}{\textit{Panel A: Retrospective oracle gap}} \\
+\addlinespace[2pt]
+Quantity & OA & BA & NMI & ARI \\
+\midrule
+Mean oracle gap
+& 0.0042
+& 0.0206
+& 0.0093
+& 0.0058 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Panel B: Selector-rule ablations}} \\
+\addlinespace[2pt]
+\multicolumn{1}{@{}l}{Rule change} &
+\multicolumn{4}{l}{Observed consequence} \\
+\midrule
+
+\multicolumn{1}{@{}l}{Remove largest-region constraint}
+&
+\multicolumn{4}{p{0.70\textwidth}@{}}{
+Indian Pines decreased from 35 to 10 regions; HongHu decreased from 46 to
+six regions. HongHu BA, NMI, and ARI fell to 0.2153, 0.6076, and 0.6073.
+} \\
+
+\multicolumn{1}{@{}l}{Use stability alone}
+&
+\multicolumn{4}{p{0.70\textwidth}@{}}{
+LongKou decreased to two regions; HongHu and Botswana collapsed to one
+region. Mean NMI fell from 0.7245 to 0.4665.
+} \\
+
+\multicolumn{1}{@{}l}{Remove entropy condition}
+&
+\multicolumn{4}{p{0.70\textwidth}@{}}{
+No selected endpoint changed in the nine nominal runs.
+} \\
+
+\multicolumn{1}{@{}l}{Remove compression condition}
+&
+\multicolumn{4}{p{0.70\textwidth}@{}}{
+No selected endpoint changed in the nine nominal runs.
+} \\
+
+\multicolumn{1}{@{}l}{Remove persistence condition}
+&
+\multicolumn{4}{p{0.70\textwidth}@{}}{
+Only HongHu changed, from 46 to 49 regions, with negligible metric
+differences.
+} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The mean oracle gaps were 0.0042 for OA, 0.0206 for BA, 0.0093 for NMI,
+and 0.0058 for ARI. These values indicate that the selected endpoints were
+usually close to the best stored candidate, although the larger BA gap shows
+that the partition-based criteria were not equivalent to optimising class-balanced
+recall.
+
+The rule ablation identified the largest-region constraint as the main defence
+against excessive consolidation. Removing it reduced Indian Pines from 35 to
+10 regions and HongHu from 46 to six. On HongHu, BA fell from 0.6198 to
+0.2153, NMI from 0.7649 to 0.6076, and ARI from 0.8586 to 0.6073.
+A stability-only selector was still less reliable: it reduced LongKou to two
+regions and produced single-region outputs on HongHu and Botswana. Its mean
+NMI was 0.4665, compared with 0.7245 for the complete selector.
+
+Removing the entropy or compression condition did not alter any nominal
+endpoint, while removing persistence changed only HongHu from 46 to 49
+regions with negligible metric differences. These conditions were inactive in
+most nominal runs but remained part of the rule because they describe
+different failure modes and become relevant when the consolidation path
+changes under perturbation.
+
+The sensitivity runs did not identify one operating scale that behaved
+similarly on all three scenes. PCA search dimension had the smallest effect,
+whereas spatial reach, diffusion depth, and fine-mode radius could change the
+partition abruptly. The endpoint guards rejected several collapsed solutions,
+but the primary procedure still required scene-specific scale settings. This
+dependence motivated the automatic-selection experiment described next.
+%==============================================================================
+% 3.7 Perturbation response and cross-device repeatability
+%==============================================================================
+%==============================================================================
+% 3.7 Perturbation response and cross-device repeatability
+%==============================================================================
+\subsection{Automatic operating-point selection}
+\label{subsec:auto_selector_results}
+
+The locked automatic rule returned an admissible operating point for all eight
+development scenes. Seven scenes selected the conservative \(\beta=0\)
+branch, while KSC selected the size-aware branch. No development scene
+required abstention.
+
+Across the eight development scenes, automatic selection gave mean OA, BA,
+NMI, and ARI values of 0.5744, 0.5384, 0.7239, and 0.5813, respectively.
+The corresponding means from the primary scene-specific configurations were
+0.6086, 0.5137, 0.7089, and 0.5666. Automatic selection therefore changed
+the mean metrics by \(-0.0341\) for OA, \(+0.0246\) for BA,
+\(+0.0150\) for NMI, and \(+0.0147\) for ARI.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Mean performance across the eight development scenes for the primary
+scene-specific configurations and the automatic-selection experiment.
+Reference metrics were calculated only after the automatic operating point
+for each scene had been selected.}
+\label{tab:auto_selector_summary}
+
+\renewcommand{\arraystretch}{1.06}
+\setlength{\tabcolsep}{7pt}
+
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Procedure & OA & BA & NMI & ARI \\
+\midrule
+Primary scene-specific
+& 0.6086 & 0.5137 & 0.7089 & 0.5666 \\
+Automatic selection
+& 0.5744 & 0.5384 & 0.7239 & 0.5813 \\
+Difference
+& -0.0341 & +0.0246 & +0.0150 & +0.0147 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The retrospective Trento transfer test selected \(T=100\),
+\(\gamma=1.25\), \(r_f=0.1360\), \(\tau=0.75\), and \(\beta=0.5\),
+producing 67 full-scene regions. After the selected partition had been frozen,
+reference-based evaluation gave an OA of 0.6148, BA of 0.5122, NMI of 0.7656,
+and ARI of 0.7164.
+
+The automatic experiment therefore showed that the principal operating
+settings could be selected from image-derived partition statistics without
+using target-scene labels or \(K\). The procedure retained comparable
+information-based agreement across the development scenes, with higher mean
+BA, NMI, and ARI and lower mean OA than the primary scene-specific
+configurations. The Trento automatic result is reported as a retrospective
+transfer test rather than as a second independent holdout.
+
+
+\subsection{Perturbation response and cross-device repeatability}
+\label{subsec:robustness_results}
+
+Perturbation response was examined on Salinas-A, Indian Pines, and Pavia
+University using two independently seeded runs for 1\% additive noise and
+5\% random pixel replacement. Salinas-A and Indian Pines retained their frozen
+consolidation thresholds. For Pavia University, the complete partition-based
+endpoint rule was rerun because the original threshold was not assumed to
+remain admissible after perturbation.
+
+Table~\ref{tab:perturbation_results} reports the complete semantic response.
+Salinas-A changed little under additive noise. Its two NMI values were 0.8668
+and 0.8668, compared with 0.8659 for the frozen partition, while ARI remained
+near 0.750. Pixel replacement produced eight and seven regions and retained
+similar or slightly higher NMI and ARI values.
+
+\begin{table}[!t]
+\centering
+\scriptsize
+\caption{Perturbation response on Salinas-A, Indian Pines, and Pavia
+University. Salinas-A and Indian Pines used their frozen consolidation
+thresholds. Pavia University used partition-based endpoint re-selection. The
+unperturbed row is included as the reference for each scene.}
+\label{tab:perturbation_results}
+
+\renewcommand{\arraystretch}{0.98}
+\setlength{\tabcolsep}{3.5pt}
+
+\begin{tabular}{@{}llclrrrrr@{}}
+\toprule
+Dataset &
+Condition &
+Run &
+Selector status &
+Regions &
+OA &
+BA &
+NMI &
+ARI \\
+\midrule
+
+\multirow{5}{*}{Salinas-A}
+& Unperturbed & -- & Frozen result & 7
+& 0.8057 & 0.7475 & 0.8659 & 0.7495 \\
+& Noise 1\% & 1 & Frozen threshold & 7
+& 0.8068 & 0.7484 & 0.8668 & 0.7506 \\
+& Noise 1\% & 2 & Frozen threshold & 7
+& 0.8063 & 0.7479 & 0.8668 & 0.7506 \\
+& Pixel replacement 5\% & 1 & Frozen threshold & 8
+& 0.8087 & 0.7492 & 0.8871 & 0.7719 \\
+& Pixel replacement 5\% & 2 & Frozen threshold & 7
+& 0.8110 & 0.7516 & 0.8785 & 0.7617 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{Indian Pines}
+& Unperturbed & -- & Frozen result & 35
+& 0.4181 & 0.4956 & 0.5885 & 0.3022 \\
+& Noise 1\% & 1 & Frozen threshold & 36
+& 0.4188 & 0.5361 & 0.5899 & 0.2996 \\
+& Noise 1\% & 2 & Frozen threshold & 34
+& 0.4430 & 0.5244 & 0.5864 & 0.3042 \\
+& Pixel replacement 5\% & 1 & Frozen threshold & 41
+& 0.3853 & 0.4820 & 0.5795 & 0.2542 \\
+& Pixel replacement 5\% & 2 & Frozen threshold & 39
+& 0.3249 & 0.4127 & 0.5108 & 0.1349 \\
+\addlinespace[2pt]
+
+\multirow{5}{*}{Pavia University}
+& Unperturbed & -- & Frozen result & 207
+& 0.6365 & 0.5009 & 0.6836 & 0.5137 \\
+& Noise 1\% & 1 & Selected & 102
+& 0.6275 & 0.5214 & 0.6813 & 0.4933 \\
+& Noise 1\% & 2 & Selected & 147
+& 0.6390 & 0.5123 & 0.6873 & 0.5133 \\
+& Pixel replacement 5\% & 1 & Abstained & 700
+& 0.4760 & 0.3098 & 0.4943 & 0.2399 \\
+& Pixel replacement 5\% & 2 & Abstained & 697
+& 0.4723 & 0.3098 & 0.4964 & 0.2372 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Indian Pines remained close to its frozen result under additive noise, although
+the two runs differed more in OA and BA than Salinas-A. Pixel replacement had
+a clearer effect. NMI decreased to 0.5795 and 0.5108, while ARI decreased to
+0.2542 and 0.1349. The second replacement run therefore produced the largest
+semantic change among the fixed-threshold trials.
+
+For Pavia University, the selector accepted both noise-perturbed sequences.
+The selected outputs contained 102 and 147 regions, and their NMI values of
+0.6813 and 0.6873 were close to the unperturbed value of 0.6836. Their
+full-scene ARI values against the frozen partition were 0.9628 and 0.9813;
+the corresponding labelled-support values were 0.9636 and 0.9974
+(Table~\ref{tab:pavia_partition_agreement}).
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Partition-level agreement for the adaptive Pavia University
+perturbation runs. ARI was calculated between each perturbed partition and the
+frozen unperturbed partition.}
+\label{tab:pavia_partition_agreement}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}lclrrr@{}}
+\toprule
+Perturbation &
+Run &
+Selector status &
+Regions &
+ARI, all pixels &
+ARI, labelled pixels \\
+\midrule
+Noise 1\% & 1 & Selected & 102 & 0.9628 & 0.9636 \\
+Noise 1\% & 2 & Selected & 147 & 0.9813 & 0.9974 \\
+Pixel replacement 5\% & 1 & Abstained & 700 & 0.4855 & 0.5563 \\
+Pixel replacement 5\% & 2 & Abstained & 697 & 0.4851 & 0.5782 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Neither pixel-replacement sequence contained a persistent, non-degenerate
+Pavia endpoint. The selector therefore abstained and retained the
+unconsolidated diagnostic outputs rather than presenting them as accepted
+Graph-RMS partitions. These outputs contained 700 and 697 regions and had
+full-scene ARI values of approximately 0.485 against the frozen partition.
+The abstention records a loss of endpoint support rather than hiding the
+perturbation response behind a forced result.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[
+    width=0.86\textwidth,
+    height=0.32\textheight,
+    keepaspectratio
+]{figures/repeatability_and_perturbation_matched_style.png}
+\caption{Perturbation response and cross-device repeatability. The left panel
+shows ARI between frozen CPU partitions and new GPU partitions over all pixels
+and over the labelled support. The right panel shows agreement between the
+frozen Pavia University partition and the adaptively re-selected perturbation
+outputs. The selector accepted both additive-noise trials and abstained for
+both pixel-replacement trials.}
+\label{fig:robustness_repeatability}
+\end{figure}
+
+Cross-device repeatability was examined by comparing the frozen CPU partitions
+with new GPU executions on KSC, WHU-Hi HanChuan, and Botswana
+(Table~\ref{tab:cross_device_repeatability}). KSC and Botswana retained
+all-pixel ARI values above 0.99. HanChuan showed the largest change, with its
+region count increasing from 83 to 102 and its all-pixel ARI decreasing to
+0.9114. Agreement remained higher on its labelled support, where ARI was
+0.9578.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{Cross-device partition repeatability. Frozen CPU partitions were
+compared with new GPU executions. Region-count differences do not imply that
+the principal spatial partition changed to the same extent.}
+\label{tab:cross_device_repeatability}
+
+\renewcommand{\arraystretch}{1.06}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Dataset &
+CPU regions &
+GPU regions &
+Difference &
+ARI, all pixels &
+ARI, labelled pixels \\
+\midrule
+KSC
+& 720 & 686 & \(-34\) & 0.9960 & 0.9996 \\
+
+WHU-Hi HanChuan
+& 83 & 102 & \(+19\) & 0.9114 & 0.9578 \\
+
+Botswana
+& 38 & 43 & \(+5\) & 0.9921 & 0.9854 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The cross-device results show strong partition-level repeatability, but not
+bitwise identity. Most differences were associated with the splitting or
+merging of small regions. Graph-RMS should therefore be expected to preserve
+the principal scene structure across the tested computational paths without
+guaranteeing an identical region count.
+
+
+%==============================================================================
+% 3.8 Runtime, memory use, and empirical scaling
+%==============================================================================
+\subsection{Runtime, memory use, and empirical scaling}
+\label{subsec:runtime_results}
+
+Runtime and memory use were measured over three complete executions of each
+scene on an NVIDIA A100-SXM4 GPU with 80~GB of memory. The timing boundary
+included scene standardisation, graph construction, affinity calculation,
+diffusion, fine-mode formation, spatial cleanup, prototype consolidation, and
+endpoint selection.
+
+Table~\ref{tab:runtime_memory_complete} reports the full profiling results.
+Mean runtime ranged from \(1.21\)~s on Salinas-A to \(42.34\)~s on
+WHU-Hi HongHu. Trento required \(4.54\)~s, while the three largest runtime
+values occurred on HongHu, HanChuan, and Botswana.
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\caption{End-to-end Graph-RMS runtime and memory use on the nine complete
+scenes. Runtime values are means and standard deviations over three executions
+on an NVIDIA A100-SXM4 GPU. Process memory is peak resident-set size; GPU
+memory is peak allocated memory.}
+\label{tab:runtime_memory_complete}
+
+\renewcommand{\arraystretch}{1.05}
+\setlength{\tabcolsep}{5pt}
+
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Dataset &
+Runtime (s) &
+Peak process memory (MB) &
+Peak allocated GPU memory (MB) \\
+\midrule
+Salinas-A
+& \(1.21 \pm 0.56\)
+& 1\,538
+& 253 \\
+
+Indian Pines
+& \(1.60 \pm 0.05\)
+& 2\,005
+& 716 \\
+
+KSC
+& \(23.34 \pm 3.20\)
+& 4\,007
+& 10\,518 \\
+
+Pavia University
+& \(11.34 \pm 0.06\)
+& 3\,021
+& 6\,944 \\
+
+WHU-Hi LongKou
+& \(21.61 \pm 2.89\)
+& 3\,522
+& 7\,364 \\
+
+WHU-Hi HongHu
+& \(42.34 \pm 4.38\)
+& 5\,084
+& 14\,932 \\
+
+WHU-Hi HanChuan
+& \(37.28 \pm 3.70\)
+& 4\,593
+& 12\,335 \\
+
+Botswana
+& \(24.74 \pm 2.93\)
+& 4\,498
+& 12\,639 \\
+
+Trento
+& \(4.54 \pm 0.58\)
+& 2\,433
+& 3\,342 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[
+    width=0.86\textwidth,
+    height=0.32\textheight,
+    keepaspectratio
+]{figures/fig6_runtime_memory.png}
+\caption{End-to-end runtime and peak allocated GPU memory for the nine
+complete scenes. Runtime values are three-run means. The memory values show
+active allocation rather than the larger amount reserved by the GPU memory
+allocator.}
+\label{fig:runtime_memory}
+\end{figure}
+
+Peak allocated GPU memory ranged from 253~MB for Salinas-A to 14\,932~MB
+for HongHu. KSC, HanChuan, and Botswana each required more than 10~GB, while
+Trento required 3.34~GB. Peak process memory was lower than allocated GPU
+memory on the larger scenes and ranged from approximately 1.54 to 5.08~GB.
+
+Resource use was not determined by pixel count alone. Botswana contained fewer
+spectral bands than the three WHU-Hi scenes but required 12.64~GB of allocated
+GPU memory. LongKou required 7.36~GB despite having more pixels than Pavia
+University. Differences in spectral dimensionality, retained graph edges,
+diffusion depth, image geometry, fine-region count, and consolidation path all
+contributed to the observed profile.
+
+Across the nine scenes, the fitted relation between mean runtime and pixel
+count was
+
+\begin{equation}
+t(N)\propto N^{0.891}.
+\label{eq:empirical_runtime_scaling}
+\end{equation}
+
+The sublinear exponent describes the measured scene set and should not be read
+as a theoretical complexity result. The formal analysis in
+Section~\ref{subsec:additional_analysis} shows that sparse graph construction
+and diffusion are approximately linear in \(N\) when neighbourhood caps are
+fixed, whereas exact prototype-neighbour search can become more expensive when
+the fine partition contains many regions. The empirical fit combines these
+stages with scene-dependent band counts, graph densities, and checkpoints.
+
+All nine primary scenes completed in less than 45~s on the A100, making runtime
+less restrictive than memory use for the tested scenes. Peak allocated GPU
+memory nevertheless reached approximately 15~GB on HongHu. This requirement
+can exceed the capacity of commodity GPUs and becomes important when extending
+the method to larger swaths. Lower-memory diffusion, streamed affinity
+construction, and approximate prototype-neighbour search would therefore be
+needed for more memory-constrained or substantially larger deployments.
+
+\FloatBarrier
+%==============================================================================
+% 7. Discussion
+%==============================================================================
+%==============================================================================
+% 4. Discussion
+%==============================================================================
+%==============================================================================
+% 4. Discussion
+%==============================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+Graph-RMS recovered spectral--spatial structure that corresponded with the
+reference maps without receiving target-scene labels or the reference class
+count during processing. Its most consistent result was NMI: the method ranked
+first on all nine scenes in the five-method classical protocol. OA and BA were more variable because they used
+one-to-one region-to-class assignment. When several coherent regions belonged
+to the same semantic category, only one could be matched to that category and
+the remaining regions were counted as errors. The difference between these
+metric families is therefore part of the result rather than a contradiction
+between them.
+
+The independent Trento holdout supports this interpretation. Graph-RMS reached
+an NMI of 0.8495 and ARI of 0.9447 after the procedure had been fixed on the
+development scenes; the corresponding one-to-one Hungarian OA was 0.8533. Its homogeneity of 0.9636 shows that most discovered
+regions were dominated by one reference category, while the lower completeness
+of 0.7596 indicates that several categories were represented by multiple
+regions. Forcing the frozen partition to six groups reduced all four primary
+metrics. The additional regions therefore retained useful structure rather
+than arising only from arbitrary label proliferation.
+
+The comparison with Leiden clarifies the contribution of the stages that
+follow graph construction. The nearly identical mean NMI values show that the
+weighted graph already captures a substantial part of the recoverable scene
+structure, and the present evidence does not support claiming that Graph-RMS
+is uniformly superior to direct community detection. The two procedures,
+however, do not simply produce equivalent outcomes. Graph-RMS gave markedly
+higher OA and ARI on LongKou, HongHu, and Trento, whereas Leiden was stronger
+on Salinas-A, KSC, and Botswana. These scene-dependent differences indicate
+that diffusion and subsequent region formation alter how the graph structure
+is expressed rather than merely adding computation to the same partition.
+
+The additional stages also provide an explicit fine-to-coarse operating
+procedure. Diffusion changes the representation before region formation,
+fine modes expose local structure, reciprocal prototype consolidation reduces
+that structure, and the endpoint rule rejects collapsed or unsupported
+candidates. The Pavia University ablation shows that removing these stages can
+produce either collapse or severe fragmentation, while the perturbation
+experiments show that the endpoint rule can abstain when an admissible
+partition is not supported. These properties do not constitute a general
+accuracy advantage over Leiden, but they define the operating behaviour that
+distinguishes Graph-RMS from direct community detection
+\citep{traag2019}.
+
+Fixed-default HDBSCAN behaved differently. Graph-RMS exceeded it in all 36
+scene--metric comparisons, while HDBSCAN assigned large fractions of KSC and
+Trento to noise and returned very few groups on several scenes. This result is
+specific to the declared fixed-default protocol. HDBSCAN was included as a
+density-based reference and was not exhaustively optimised for each scene, so
+the comparison should not be interpreted as general superiority over
+density-based clustering \citep{campello2013}.
+
+The Pavia University ablation shows why Graph-RMS must be considered as an
+integrated procedure. Removing spatial affinity produced a single region,
+whereas removing diffusion or fine-mode grouping produced thousands of small
+regions. Spatial cleanup reduced isolated assignments, and prototype
+consolidation converted the detailed fine partition into a more usable region
+set. The size-aware dispersion term improved OA, NMI, and ARI relative to the
+conservative endpoint, although BA moved in the opposite direction. No single
+stage improved every measure; together, the stages controlled collapse,
+fragmentation, and unsupported merging.
+
+The sensitivity analysis identifies scale selection as the main source of
+variation in the primary procedure. PCA dimension had a comparatively small
+effect on Salinas-A and Pavia University, whereas spatial reach, diffusion
+checkpoint, and fine-mode radius could alter the partition abruptly. The
+largest-region constraint prevented several stable but degenerate endpoints,
+and stability alone was insufficient because a collapsed partition could
+remain stable over adjacent consolidation thresholds.
+
+The automatic-selection experiment addressed this dependence directly. After
+a single global rule had been calibrated on the eight development scenes,
+selection for an individual scene required neither its reference labels nor
+its semantic class count. Mean BA, NMI, and ARI increased by 0.0246, 0.0150,
+and 0.0147 relative to the primary scene-specific configurations, while mean
+OA decreased by 0.0341. The result indicates that manually specified
+scene-specific scales can be replaced by a common partition-based selection
+procedure without reducing the mean information-based agreement on the
+development scenes. The lower OA is consistent with the finer partitions
+returned by the automatic procedure and the one-to-one matching penalty used
+for that metric.
+
+The automatic Trento run provides a retrospective transfer test of the same
+rule. It selected an operating point without using Trento labels during
+selection and obtained NMI \(=0.7656\) and ARI \(=0.7164\), compared with
+0.8495 and 0.9447 for the pre-specified primary Trento configuration. The
+corresponding OA decreased from 0.8533 to 0.6148. The difference confirms
+that scale selection remains consequential: automatic selection removes the
+need to prescribe the principal target-scene scales, but it does not reproduce
+the performance of the manually specified primary configuration on Trento.
+Since the primary Trento result was already known when the automatic rule was
+designed, this run is interpreted as a retrospective transfer test rather than
+an additional independent holdout. Prospective evaluation on further unseen
+acquisitions is needed to establish how broadly the automatic rule transfers
+across sensors and scene types.
+
+Perturbation behaviour also depended on scene structure. Salinas-A remained
+close to its frozen partition under both tested perturbations, while Indian
+Pines was more affected by pixel replacement. On Pavia University, endpoint
+re-selection recovered partitions close to the frozen result under additive
+noise and abstained under the stronger pixel-replacement trials. This
+abstention is useful because it distinguishes a supported endpoint from a
+partition produced merely because the pipeline was forced to return one.
+Cross-device ARI remained above 0.91 on the three tested scenes, although
+small-region counts changed.
+
+Graph-RMS is most directly suited to exploratory analysis before a reliable
+semantic legend is available. The discovered regions may support
+candidate-region inspection or subsequent annotation, although annotation
+efficiency was not measured here. Computational scalability remains a
+practical constraint. Peak allocated GPU memory reached approximately
+15~GB on HongHu, and exact prototype-neighbour search has quadratic worst-case
+dependence on the number of current prototypes. The 189\,178-region output in
+the Pavia ablation occurred after fine-mode grouping was deliberately removed
+and therefore does not represent normal operation, but it illustrates why
+controlling fine-partition granularity is computationally important. The
+automatic-selection experiment reduces dependence on manually specified scene
+scales, while prospective transfer across sensors and acquisition conditions
+remains to be established. Lower-memory graph operations, approximate
+prototype search, and broader transfer testing are therefore the main
+practical directions for extending the present method.
+% 5. Conclusion
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Graph-RMS provides a training-free procedure for discovering coherent
+spectral--spatial regions without requiring labelled training samples or a
+predefined semantic class count during scene processing. In the primary
+nine-scene evaluation, it achieved the highest NMI on every scene in the
+five-method classical comparison. On the independent Trento holdout, NMI and
+ARI were 0.8495 and 0.9447, while the corresponding one-to-one Hungarian OA
+was 0.8533. Graph-RMS exceeded fixed-default HDBSCAN under the declared
+protocol, whereas Leiden remained a competitive same-graph alternative and
+showed that graph construction itself accounts for a substantial part of the
+recoverable structure.
+
+A separate automatic-selection experiment showed that the principal
+scene-dependent operating settings could be selected without target-scene
+labels or \(K\) after a single global rule had been calibrated on the
+development scenes. Across those scenes, automatic selection increased mean
+BA, NMI, and ARI while reducing mean OA. The same frozen rule returned an
+operating point in a retrospective Trento transfer test, although its
+reference-based agreement was lower than that of the pre-specified primary
+configuration. Graph-RMS is therefore best viewed as a method for discovering
+spectral--spatial structure during exploratory analysis rather than for
+estimating the number of semantic classes.
+%==============================================================================
+% Declarations
+%==============================================================================
+
+
+\section*{Author Contributions}
+
+Simhaa T.\,T.: Methodology, Software, Validation, Formal analysis,
+Investigation, Visualisation, Writing -- original draft.
+Steven Yves Le Moan: Conceptualisation, Methodology, Supervision,
+Writing -- review and editing.
+Shihabudheen K.\,V.: Conceptualisation, Methodology, Supervision,
+Writing -- review and editing.
+\section*{Funding}
+
+This research received no specific grant from any funding agency in the
+public, commercial, or not-for-profit sectors.
+
+\section*{Disclosure statement}
+
+The authors report there are no competing interests to declare.
+
+
+\section*{Data availability statement}
+
+The hyperspectral datasets used in this study are publicly available from the
+original repositories cited in the manuscript. The Graph-RMS source code,
+derived partitions, experimental configurations, evaluation summaries, and
+numerical results are available from
+\url{https://github.com/Simhaatt/Graph-RMS}. The version-specific Zenodo DOI
+will be inserted in the final manuscript after release \texttt{v1.0.0} is
+archived. The repository does not redistribute the original hyperspectral
+datasets.
+
+\section*{Ethics statement}
+
+Not applicable. The study used public remote-sensing benchmark datasets and
+did not involve human participants, personal data, or animals.
+
+\section*{Declaration of Generative AI and AI-assisted technologies}
+
+During preparation of this manuscript, the authors used OpenAI ChatGPT to
+assist with manuscript organisation and language refinement. The tool was not
+used to generate experimental data or perform the analyses reported in this
+study. All generated text was reviewed and revised by the authors, who take
+full responsibility for the final content of the manuscript.
+%==============================================================================
+% Supplementary material
+%==============================================================================
+
+%==============================================================================
+% References
+%==============================================================================
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

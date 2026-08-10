@@ -1,0 +1,789 @@
+[
+  {
+    "dataset": "pavia_university",
+    "perturbation": "noise_1pct_seed1",
+    "kind": "noise",
+    "strength": 0.01,
+    "seed": 1,
+    "selected_threshold": 0.6,
+    "selected_clusters_full": 102,
+    "selector_status": "selected",
+    "selector_reason": "most compressed persistent non-degenerate endpoint",
+    "partition_ari_all_pixels_vs_frozen": 0.9627593440206076,
+    "partition_ari_labelled_pixels_vs_frozen": 0.9635891859558651,
+    "overall_accuracy": 0.6274546474658688,
+    "balanced_accuracy": 0.5213927246184485,
+    "nmi": 0.6812541418640252,
+    "ari": 0.49333457539063114,
+    "runtime_seconds": 15.659358294000413,
+    "peak_gpu_allocated_mb": 6944.055808,
+    "label_free_curve": [
+      {
+        "prototype_threshold": 0.0,
+        "n_clusters_full": 701,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.556844392004246,
+        "microcluster_mass_full": 0.007719382835101253,
+        "adjacent_partition_ari_label_free": null
+      },
+      {
+        "prototype_threshold": 0.05,
+        "n_clusters_full": 698,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.55719984336601,
+        "microcluster_mass_full": 0.007719382835101253,
+        "adjacent_partition_ari_label_free": 0.9999999905258232
+      },
+      {
+        "prototype_threshold": 0.1,
+        "n_clusters_full": 676,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.5596818448716064,
+        "microcluster_mass_full": 0.00748794599807136,
+        "adjacent_partition_ari_label_free": 0.9999983070526873
+      },
+      {
+        "prototype_threshold": 0.15,
+        "n_clusters_full": 627,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.5654849036583341,
+        "microcluster_mass_full": 0.0066875602700096435,
+        "adjacent_partition_ari_label_free": 0.9999931645149966
+      },
+      {
+        "prototype_threshold": 0.2,
+        "n_clusters_full": 545,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.5757638953176628,
+        "microcluster_mass_full": 0.00493731918997107,
+        "adjacent_partition_ari_label_free": 0.9999537351035439
+      },
+      {
+        "prototype_threshold": 0.25,
+        "n_clusters_full": 489,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.5832179889622809,
+        "microcluster_mass_full": 0.003235294117647059,
+        "adjacent_partition_ari_label_free": 0.9999496193835815
+      },
+      {
+        "prototype_threshold": 0.3,
+        "n_clusters_full": 424,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.5922239188290772,
+        "microcluster_mass_full": 0.0017936354869816779,
+        "adjacent_partition_ari_label_free": 0.999859560491492
+      },
+      {
+        "prototype_threshold": 0.35,
+        "n_clusters_full": 365,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.6008131730056028,
+        "microcluster_mass_full": 0.0008919961427193828,
+        "adjacent_partition_ari_label_free": 0.9992182373938656
+      },
+      {
+        "prototype_threshold": 0.4,
+        "n_clusters_full": 293,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.6152607941814455,
+        "microcluster_mass_full": 0.0003085824493731919,
+        "adjacent_partition_ari_label_free": 0.999758369705529
+      },
+      {
+        "prototype_threshold": 0.45,
+        "n_clusters_full": 201,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.6385121285682649,
+        "microcluster_mass_full": 0.0001446480231436837,
+        "adjacent_partition_ari_label_free": 0.9990484121303083
+      },
+      {
+        "prototype_threshold": 0.5,
+        "n_clusters_full": 151,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.6534433181726768,
+        "microcluster_mass_full": 0.0001446480231436837,
+        "adjacent_partition_ari_label_free": 0.9977874674888491
+      },
+      {
+        "prototype_threshold": 0.55,
+        "n_clusters_full": 125,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.6617045358428715,
+        "microcluster_mass_full": 0.0001446480231436837,
+        "adjacent_partition_ari_label_free": 0.9980275470457027
+      },
+      {
+        "prototype_threshold": 0.6,
+        "n_clusters_full": 102,
+        "largest_cluster_fraction_full": 0.38709257473481196,
+        "normalized_entropy_full": 0.6719755187820141,
+        "microcluster_mass_full": 0.0001446480231436837,
+        "adjacent_partition_ari_label_free": 0.9977721821087278
+      },
+      {
+        "prototype_threshold": 0.65,
+        "n_clusters_full": 39,
+        "largest_cluster_fraction_full": 0.4358919961427194,
+        "normalized_entropy_full": 0.675519508468866,
+        "microcluster_mass_full": 9.161041465766634e-05,
+        "adjacent_partition_ari_label_free": 0.8519177829323357
+      },
+      {
+        "prototype_threshold": 0.7,
+        "n_clusters_full": 16,
+        "largest_cluster_fraction_full": 0.5209546769527483,
+        "normalized_entropy_full": 0.6864717005163172,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.7783004316946354
+      },
+      {
+        "prototype_threshold": 0.75,
+        "n_clusters_full": 10,
+        "largest_cluster_fraction_full": 0.5901301832208293,
+        "normalized_entropy_full": 0.6416375613921811,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.811134388153366
+      },
+      {
+        "prototype_threshold": 1.0,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.0
+      },
+      {
+        "prototype_threshold": 1.5,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 2.0,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 3.0,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 1.0
+      }
+    ],
+    "selector_audit": {
+      "status": "selected",
+      "reason": "most compressed persistent non-degenerate endpoint",
+      "fragmentation_cluster_gate": 228,
+      "largest_cluster_fraction_cap": 0.4,
+      "normalized_entropy_floor": 0.35,
+      "minimum_endpoint_clusters": 102,
+      "compression_band_multiplier": 1.25,
+      "chosen_segment": [
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6
+      ]
+    }
+  },
+  {
+    "dataset": "pavia_university",
+    "perturbation": "noise_1pct_seed2",
+    "kind": "noise",
+    "strength": 0.01,
+    "seed": 2,
+    "selected_threshold": 3.0,
+    "selected_clusters_full": 147,
+    "selector_status": "selected",
+    "selector_reason": "most compressed persistent non-degenerate endpoint",
+    "partition_ari_all_pixels_vs_frozen": 0.981277041146458,
+    "partition_ari_labelled_pixels_vs_frozen": 0.9974036341765483,
+    "overall_accuracy": 0.6390265569478212,
+    "balanced_accuracy": 0.5123196753492307,
+    "nmi": 0.6873133266916619,
+    "ari": 0.5133467997967829,
+    "runtime_seconds": 14.82366765900042,
+    "peak_gpu_allocated_mb": 6943.494656,
+    "label_free_curve": [
+      {
+        "prototype_threshold": 0.0,
+        "n_clusters_full": 708,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5517811374860587,
+        "microcluster_mass_full": 0.007854387656702025,
+        "adjacent_partition_ari_label_free": null
+      },
+      {
+        "prototype_threshold": 0.05,
+        "n_clusters_full": 704,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5522433770009109,
+        "microcluster_mass_full": 0.007854387656702025,
+        "adjacent_partition_ari_label_free": 0.9999999865733105
+      },
+      {
+        "prototype_threshold": 0.1,
+        "n_clusters_full": 683,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5545601917700766,
+        "microcluster_mass_full": 0.007709739633558341,
+        "adjacent_partition_ari_label_free": 0.9999976782061127
+      },
+      {
+        "prototype_threshold": 0.15,
+        "n_clusters_full": 630,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5608418329409329,
+        "microcluster_mass_full": 0.006851494696239151,
+        "adjacent_partition_ari_label_free": 0.9999947843606317
+      },
+      {
+        "prototype_threshold": 0.2,
+        "n_clusters_full": 569,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5679214500919502,
+        "microcluster_mass_full": 0.005703953712632594,
+        "adjacent_partition_ari_label_free": 0.9999606444158279
+      },
+      {
+        "prototype_threshold": 0.25,
+        "n_clusters_full": 507,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5758586868335204,
+        "microcluster_mass_full": 0.0038862102217936353,
+        "adjacent_partition_ari_label_free": 0.9999504876541283
+      },
+      {
+        "prototype_threshold": 0.3,
+        "n_clusters_full": 447,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5840774132323933,
+        "microcluster_mass_full": 0.002497589199614272,
+        "adjacent_partition_ari_label_free": 0.9999273631990572
+      },
+      {
+        "prototype_threshold": 0.35,
+        "n_clusters_full": 379,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.5934435185864988,
+        "microcluster_mass_full": 0.001176470588235294,
+        "adjacent_partition_ari_label_free": 0.999146966739145
+      },
+      {
+        "prototype_threshold": 0.4,
+        "n_clusters_full": 333,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6016630336817009,
+        "microcluster_mass_full": 0.0008100289296046287,
+        "adjacent_partition_ari_label_free": 0.9998583347335858
+      },
+      {
+        "prototype_threshold": 0.45,
+        "n_clusters_full": 238,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6228971184037462,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.999417719415779
+      },
+      {
+        "prototype_threshold": 0.5,
+        "n_clusters_full": 182,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6388219650479873,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9990994920040611
+      },
+      {
+        "prototype_threshold": 0.55,
+        "n_clusters_full": 171,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.640309401851527,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9991358234671108
+      },
+      {
+        "prototype_threshold": 0.6,
+        "n_clusters_full": 162,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6433209957786182,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9997827700946798
+      },
+      {
+        "prototype_threshold": 0.65,
+        "n_clusters_full": 156,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6440591103026626,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9993670814270206
+      },
+      {
+        "prototype_threshold": 0.7,
+        "n_clusters_full": 154,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6444365618393852,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9999197393856041
+      },
+      {
+        "prototype_threshold": 0.75,
+        "n_clusters_full": 151,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.6457254339020757,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9999393920095104
+      },
+      {
+        "prototype_threshold": 1.0,
+        "n_clusters_full": 147,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.646735557598416,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 0.9998296868859881
+      },
+      {
+        "prototype_threshold": 1.5,
+        "n_clusters_full": 147,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.646735557598416,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 2.0,
+        "n_clusters_full": 147,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.646735557598416,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 3.0,
+        "n_clusters_full": 147,
+        "largest_cluster_fraction_full": 0.3902169720347155,
+        "normalized_entropy_full": 0.646735557598416,
+        "microcluster_mass_full": 0.00025072324011571844,
+        "adjacent_partition_ari_label_free": 1.0
+      }
+    ],
+    "selector_audit": {
+      "status": "selected",
+      "reason": "most compressed persistent non-degenerate endpoint",
+      "fragmentation_cluster_gate": 228,
+      "largest_cluster_fraction_cap": 0.4,
+      "normalized_entropy_floor": 0.35,
+      "minimum_endpoint_clusters": 147,
+      "compression_band_multiplier": 1.25,
+      "chosen_segment": [
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        1.0,
+        1.5,
+        2.0,
+        3.0
+      ]
+    }
+  },
+  {
+    "dataset": "pavia_university",
+    "perturbation": "pixel_replacement_5pct_seed1",
+    "kind": "pixel_replace",
+    "strength": 0.05,
+    "seed": 1,
+    "selected_threshold": 0.0,
+    "selected_clusters_full": 700,
+    "selector_status": "abstain",
+    "selector_reason": "no persistent non-degenerate region",
+    "partition_ari_all_pixels_vs_frozen": 0.4854627168695033,
+    "partition_ari_labelled_pixels_vs_frozen": 0.5562865836419197,
+    "overall_accuracy": 0.4760145876192257,
+    "balanced_accuracy": 0.30976861670804234,
+    "nmi": 0.494345389078513,
+    "ari": 0.23989536801385902,
+    "runtime_seconds": 14.708592783999848,
+    "peak_gpu_allocated_mb": 6943.494656,
+    "label_free_curve": [
+      {
+        "prototype_threshold": 0.0,
+        "n_clusters_full": 700,
+        "largest_cluster_fraction_full": 0.5853616200578592,
+        "normalized_entropy_full": 0.44314130840188015,
+        "microcluster_mass_full": 0.008654773384763741,
+        "adjacent_partition_ari_label_free": null
+      },
+      {
+        "prototype_threshold": 0.05,
+        "n_clusters_full": 697,
+        "largest_cluster_fraction_full": 0.5853616200578592,
+        "normalized_entropy_full": 0.4434208431343878,
+        "microcluster_mass_full": 0.00864513018322083,
+        "adjacent_partition_ari_label_free": 0.9999998635625825
+      },
+      {
+        "prototype_threshold": 0.1,
+        "n_clusters_full": 678,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.4449782686187597,
+        "microcluster_mass_full": 0.008394406943105111,
+        "adjacent_partition_ari_label_free": 0.9999857636172038
+      },
+      {
+        "prototype_threshold": 0.15,
+        "n_clusters_full": 627,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.4496246071166932,
+        "microcluster_mass_full": 0.0077965284474445515,
+        "adjacent_partition_ari_label_free": 0.9999957917981757
+      },
+      {
+        "prototype_threshold": 0.2,
+        "n_clusters_full": 565,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.45528478347525614,
+        "microcluster_mass_full": 0.0061620057859209255,
+        "adjacent_partition_ari_label_free": 0.9999799310818912
+      },
+      {
+        "prototype_threshold": 0.25,
+        "n_clusters_full": 470,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.4647578672770178,
+        "microcluster_mass_full": 0.0032690453230472516,
+        "adjacent_partition_ari_label_free": 0.9999624773428057
+      },
+      {
+        "prototype_threshold": 0.3,
+        "n_clusters_full": 390,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.47396515485928326,
+        "microcluster_mass_full": 0.0013982642237222757,
+        "adjacent_partition_ari_label_free": 0.9999397822562857
+      },
+      {
+        "prototype_threshold": 0.35,
+        "n_clusters_full": 304,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.4858787811924247,
+        "microcluster_mass_full": 0.00043876567020250724,
+        "adjacent_partition_ari_label_free": 0.9998627494210054
+      },
+      {
+        "prototype_threshold": 0.4,
+        "n_clusters_full": 219,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.5020220149463474,
+        "microcluster_mass_full": 0.00010125361620057859,
+        "adjacent_partition_ari_label_free": 0.9997057786430451
+      },
+      {
+        "prototype_threshold": 0.45,
+        "n_clusters_full": 164,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.5126667025009553,
+        "microcluster_mass_full": 0.00010125361620057859,
+        "adjacent_partition_ari_label_free": 0.9994112954548797
+      },
+      {
+        "prototype_threshold": 0.5,
+        "n_clusters_full": 97,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.5359068585836607,
+        "microcluster_mass_full": 8.678881388621023e-05,
+        "adjacent_partition_ari_label_free": 0.9984987037280432
+      },
+      {
+        "prototype_threshold": 0.55,
+        "n_clusters_full": 85,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.5385585365194021,
+        "microcluster_mass_full": 8.678881388621023e-05,
+        "adjacent_partition_ari_label_free": 0.9990248018946557
+      },
+      {
+        "prototype_threshold": 0.6,
+        "n_clusters_full": 50,
+        "largest_cluster_fraction_full": 0.5853664416586307,
+        "normalized_entropy_full": 0.5476075645923636,
+        "microcluster_mass_full": 8.678881388621023e-05,
+        "adjacent_partition_ari_label_free": 0.9943841221850923
+      },
+      {
+        "prototype_threshold": 0.65,
+        "n_clusters_full": 18,
+        "largest_cluster_fraction_full": 0.6069189971070396,
+        "normalized_entropy_full": 0.586771986065822,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.9283388474553069
+      },
+      {
+        "prototype_threshold": 0.7,
+        "n_clusters_full": 12,
+        "largest_cluster_fraction_full": 0.6293539054966248,
+        "normalized_entropy_full": 0.5917281610254198,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.9321508817686368
+      },
+      {
+        "prototype_threshold": 0.75,
+        "n_clusters_full": 11,
+        "largest_cluster_fraction_full": 0.6293539054966248,
+        "normalized_entropy_full": 0.5977220857198761,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.9961595567892211
+      },
+      {
+        "prototype_threshold": 1.0,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 0.0
+      },
+      {
+        "prototype_threshold": 1.5,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 2.0,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 3.0,
+        "n_clusters_full": 1,
+        "largest_cluster_fraction_full": 1.0,
+        "normalized_entropy_full": 0.0,
+        "microcluster_mass_full": 0.0,
+        "adjacent_partition_ari_label_free": 1.0
+      }
+    ],
+    "selector_audit": {
+      "status": "abstain",
+      "reason": "no persistent non-degenerate region",
+      "fragmentation_cluster_gate": 228
+    }
+  },
+  {
+    "dataset": "pavia_university",
+    "perturbation": "pixel_replacement_5pct_seed2",
+    "kind": "pixel_replace",
+    "strength": 0.05,
+    "seed": 2,
+    "selected_threshold": 0.0,
+    "selected_clusters_full": 697,
+    "selector_status": "abstain",
+    "selector_reason": "no persistent non-degenerate region",
+    "partition_ari_all_pixels_vs_frozen": 0.48508839988837665,
+    "partition_ari_labelled_pixels_vs_frozen": 0.5781759456312158,
+    "overall_accuracy": 0.47227417243314007,
+    "balanced_accuracy": 0.3097696380706948,
+    "nmi": 0.4963775611480672,
+    "ari": 0.23716678217140488,
+    "runtime_seconds": 14.579743461999897,
+    "peak_gpu_allocated_mb": 6943.494656,
+    "label_free_curve": [
+      {
+        "prototype_threshold": 0.0,
+        "n_clusters_full": 697,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.44000835567240726,
+        "microcluster_mass_full": 0.00843297974927676,
+        "adjacent_partition_ari_label_free": null
+      },
+      {
+        "prototype_threshold": 0.05,
+        "n_clusters_full": 692,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.4404803738073624,
+        "microcluster_mass_full": 0.00843297974927676,
+        "adjacent_partition_ari_label_free": 0.9999999956100618
+      },
+      {
+        "prototype_threshold": 0.1,
+        "n_clusters_full": 668,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.4426222327987675,
+        "microcluster_mass_full": 0.007931533269045324,
+        "adjacent_partition_ari_label_free": 0.9999989618309755
+      },
+      {
+        "prototype_threshold": 0.15,
+        "n_clusters_full": 611,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.4477598816227665,
+        "microcluster_mass_full": 0.0067357762777242045,
+        "adjacent_partition_ari_label_free": 0.9999926005248119
+      },
+      {
+        "prototype_threshold": 0.2,
+        "n_clusters_full": 556,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.45236193248001894,
+        "microcluster_mass_full": 0.005289296046287368,
+        "adjacent_partition_ari_label_free": 0.9999719535712245
+      },
+      {
+        "prototype_threshold": 0.25,
+        "n_clusters_full": 480,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.45920808776865274,
+        "microcluster_mass_full": 0.0033799421407907427,
+        "adjacent_partition_ari_label_free": 0.9999507440359036
+      },
+      {
+        "prototype_threshold": 0.3,
+        "n_clusters_full": 390,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.4690700355856967,
+        "microcluster_mass_full": 0.0014175506268081003,
+        "adjacent_partition_ari_label_free": 0.999926390511226
+      },
+      {
+        "prototype_threshold": 0.35,
+        "n_clusters_full": 342,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.47501653803773525,
+        "microcluster_mass_full": 0.0008100289296046287,
+        "adjacent_partition_ari_label_free": 0.9999382643667429
+      },
+      {
+        "prototype_threshold": 0.4,
+        "n_clusters_full": 242,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.4896803498700736,
+        "microcluster_mass_full": 0.00032304725168756025,
+        "adjacent_partition_ari_label_free": 0.9996503084949351
+      },
+      {
+        "prototype_threshold": 0.45,
+        "n_clusters_full": 143,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5105578865784989,
+        "microcluster_mass_full": 9.643201542912247e-05,
+        "adjacent_partition_ari_label_free": 0.9989590542580113
+      },
+      {
+        "prototype_threshold": 0.5,
+        "n_clusters_full": 126,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5172587795237259,
+        "microcluster_mass_full": 9.643201542912247e-05,
+        "adjacent_partition_ari_label_free": 0.9997779462739903
+      },
+      {
+        "prototype_threshold": 0.55,
+        "n_clusters_full": 86,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5293731842282602,
+        "microcluster_mass_full": 9.643201542912247e-05,
+        "adjacent_partition_ari_label_free": 0.9980820057696446
+      },
+      {
+        "prototype_threshold": 0.6,
+        "n_clusters_full": 60,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5412196330510486,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 0.997176861475115
+      },
+      {
+        "prototype_threshold": 0.65,
+        "n_clusters_full": 53,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5380638096099051,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 0.9967608262034083
+      },
+      {
+        "prototype_threshold": 0.7,
+        "n_clusters_full": 45,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5385760727656905,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 0.9975022748757582
+      },
+      {
+        "prototype_threshold": 0.75,
+        "n_clusters_full": 45,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5356308122244208,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 0.9996975998748416
+      },
+      {
+        "prototype_threshold": 1.0,
+        "n_clusters_full": 40,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5320738174169929,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 0.996119805045863
+      },
+      {
+        "prototype_threshold": 1.5,
+        "n_clusters_full": 39,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5306422207748718,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 0.9990611865544347
+      },
+      {
+        "prototype_threshold": 2.0,
+        "n_clusters_full": 39,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5306422207748718,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 1.0
+      },
+      {
+        "prototype_threshold": 3.0,
+        "n_clusters_full": 39,
+        "largest_cluster_fraction_full": 0.590771456123433,
+        "normalized_entropy_full": 0.5306422207748718,
+        "microcluster_mass_full": 8.19672131147541e-05,
+        "adjacent_partition_ari_label_free": 1.0
+      }
+    ],
+    "selector_audit": {
+      "status": "abstain",
+      "reason": "no persistent non-degenerate region",
+      "fragmentation_cluster_gate": 228
+    }
+  }
+]

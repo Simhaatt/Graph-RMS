@@ -1,0 +1,40 @@
+protocol: adaptive-v5
+status: frozen_primary
+selection_uses_reference_labels: false
+semantic_class_count_required: false
+holdout: trento
+
+shared:
+  preprocessing: per_band_zscore
+  graph_search_pca_components: 20
+  spatial_window_radius: 7
+  maximum_local_neighbors: 20
+  reciprocal_neighbor_gate: true
+  minimum_repaired_degree: 4
+  affinity: gaussian_spectral_spatial
+  affinity_bandwidths: median_edge_distance
+  diffusion_alpha: 0.5
+  fine_representation_max_pca_components: 10
+  fine_neighbor_cap: 50
+  spatial_cleanup_radius: 3
+  prototype_neighbor_cap: 30
+  dispersion_reference_minimum_mode_size: 5
+  dispersion_floor_quantile: 0.25
+  dispersion_fallback: 0.001
+  candidate_size_exponents: [0.0, 0.5]
+  endpoint_stability_minimum: 0.95
+  largest_region_fraction_maximum: 0.40
+  normalized_entropy_minimum: 0.35
+  compression_minimum: 0.20
+
+scene_specific:
+  salinas_a:        {T: 100, fine_radius: 0.1500, tau: 0.75, beta: 0.5}
+  indian_pines:     {T: 50,  fine_radius: 0.3000, tau: 0.60, beta: 0.5}
+  ksc:              {T: 100, fine_radius: 0.0125, tau: 3.00, beta: 0.5}
+  pavia_university: {T: 100, fine_radius: 0.1500, tau: 3.00, beta: 0.5}
+  whu_hi_longkou:   {T: 100, fine_radius: 0.2000, tau: 0.50, beta: 0.0}
+  whu_hi_honghu:    {T: 25,  fine_radius: 0.2000, tau: 0.75, beta: 0.5}
+  whu_hi_hanchuan:  {T: 100, fine_radius: 0.0750, tau: 3.00, beta: 0.5}
+  botswana:         {T: 50,  fine_radius: 0.1500, tau: 0.65, beta: 0.5}
+  trento:           {T: 100, fine_radius: 0.2000, tau: 0.75, beta: 0.5}
+

@@ -1,0 +1,24 @@
+{
+  "title": "Graph-RMS: reproducibility package for training-free and class-count-free spectral–spatial region discovery in hyperspectral remote-sensing images",
+  "version": "1.0.0",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "mit",
+  "language": "eng",
+  "description": "Graph-RMS is a training-free workflow for discovering coherent spectral-spatial regions in complete hyperspectral remote-sensing scenes without requiring labelled training pixels or a predefined semantic class count during scene processing. The software builds a sparse reciprocal local graph, estimates Gaussian spectral-spatial affinities, applies damped graph diffusion, extracts fine representation-space modes, performs spatial cleanup, and consolidates mode prototypes with partition-based safeguards. This reproducibility package contains the implementation used for the study, frozen primary and automatic-selector configurations, curated per-scene partitions, main and supporting result tables, figure assets, provenance records, and scripts for environment checks, reruns, audits, and table/figure export. Nine public benchmark scenes are documented, including the independent Trento holdout for the primary procedure. Raw hyperspectral cubes are not redistributed; acquisition instructions and expected filenames are provided separately. The package distinguishes true-class-count baselines from class-count-free HDBSCAN and same-graph Leiden comparisons, and records limitations including scene-dependent scale sensitivity, over-segmentation, memory demand, and the retrospective status of automatic selection on Trento.",
+  "creators": [
+    {"name": "T. T., Simhaa", "affiliation": "SSN College of Engineering", "orcid": "0009-0006-9041-1103"},
+    {"name": "Le Moan, Steven Yves", "affiliation": "Norwegian University of Science and Technology"},
+    {"name": "K. V., Shihabudheen", "affiliation": "National Institute of Technology Calicut"}
+  ],
+  "keywords": [
+    "hyperspectral imaging",
+    "remote sensing",
+    "unsupervised clustering",
+    "graph diffusion",
+    "robust mean shift",
+    "spectral-spatial region discovery",
+    "reproducible research"
+  ],
+  "notes": "Source repository: https://github.com/Simhaatt/Graph-RMS. The MIT licence applies to the software. Third-party hyperspectral datasets are not redistributed and remain under their original provider terms. Do not add a manuscript DOI unless one has actually been assigned."
+}

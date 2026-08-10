@@ -1,0 +1,36 @@
+{
+  "status": "complete",
+  "attempted_runs": 2,
+  "completed_runs": 2,
+  "failed_runs": 0,
+  "datasets": [
+    "salinas_a",
+    "indian_pines"
+  ],
+  "methods": [
+    "srusc"
+  ],
+  "seeds": [
+    1
+  ],
+  "source_provenance": {
+    "srusc": {
+      "path": "/content/graphrms_modern_baselines/external_baselines/srusc",
+      "git_commit": "3afaba26f66a325247fbd6f9fed7fdfc7c7f9180",
+      "worktree_diff_sha256": "b708fc975d7d8d7bfdb9bf50d26e720d1e260556d6d20f632fb189a0122b88b6"
+    },
+    "s2dl": {
+      "path": "/content/graphrms_modern_baselines/external_baselines/s2dl",
+      "git_commit": "75e3a73c1ed9bdea75ecd0fb2246f17d2e41958a",
+      "worktree_diff_sha256": "19de1467c83d98e5f7a2e8cb0a39d6d9cfd376c6c47deb6cca6ec52766a12ac2"
+    },
+    "dlss": {
+      "path": "/content/graphrms_modern_baselines/external_baselines/dlss/HSI_DiffusionLearning_v2_1",
+      "archive_sha256": "7a355757954042242835550efc559a95b0e1ed0228802821f24cf5ddf891ed4e"
+    }
+  },
+  "protocol": "matched PCA-20; known K for all external baselines; no labelled tuning",
+  "wall_clock_budget_minutes": null,
+  "all_saved_records": 26,
+  "all_saved_complete": 20
+}

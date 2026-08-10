@@ -1,0 +1,40 @@
+{
+  "status": "complete",
+  "registry": "D:\\cvip\\submission_package\\data\\frozen_results_registry.json",
+  "datasets": [
+    "salinas_a",
+    "indian_pines",
+    "ksc",
+    "pavia_university",
+    "whu_hi_longkou",
+    "whu_hi_honghu",
+    "whu_hi_hanchuan",
+    "botswana",
+    "trento"
+  ],
+  "methods": [
+    "minibatch_kmeans"
+  ],
+  "budgets": [
+    "full_scene",
+    "evaluated_support"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "graph_rows": 9,
+  "baseline_runs_complete": 90,
+  "baseline_runs_skipped_or_failed": 0,
+  "protocol": {
+    "cluster_scope": "all scene pixels",
+    "evaluation_scope": "reference labels > 0",
+    "preprocessing": "per-band StandardScaler then randomized PCA-20",
+    "labelled_tuning": false,
+    "full_scene_budget": "primary count-matched control",
+    "evaluated_support_budget": "diagnostic only; mask geometry is used to define the requested count"
+  }
+}

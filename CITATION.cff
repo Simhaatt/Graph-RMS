@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use Graph-RMS or its supporting outputs, please cite this software and the associated manuscript."
+title: "Graph-RMS: reproducibility package for training-free and class-count-free spectral–spatial region discovery in hyperspectral remote-sensing images"
+type: software
+version: 1.0.0
+date-released: 2026-08-10
+license: MIT
+repository-code: "https://github.com/Simhaatt/Graph-RMS"
+authors:
+  - family-names: "T. T."
+    given-names: "Simhaa"
+    affiliation: "Department of Electrical and Electronics Engineering, SSN College of Engineering, Chennai, India"
+    orcid: "https://orcid.org/0009-0006-9041-1103"
+  - family-names: "Le Moan"
+    given-names: "Steven Yves"
+    affiliation: "Department of Computer Science, Norwegian University of Science and Technology, Gjøvik, Norway"
+  - family-names: "K. V."
+    given-names: "Shihabudheen"
+    affiliation: "Department of Electrical Engineering, National Institute of Technology Calicut, Kozhikode, India"
+    email: "shihabudheen@nitc.ac.in"
+keywords:
+  - hyperspectral imaging
+  - remote sensing
+  - unsupervised clustering
+  - graph diffusion
+  - robust mean shift
+  - spectral-spatial analysis

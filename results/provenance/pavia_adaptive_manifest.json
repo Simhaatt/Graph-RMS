@@ -1,0 +1,13 @@
+{
+  "status": "complete",
+  "dataset": "pavia_university",
+  "method": "full adaptive-v5 with label-free threshold reselection",
+  "ground_truth_used_after_selection_only": true,
+  "perturbations": [
+    "noise_1pct_seed1",
+    "noise_1pct_seed2",
+    "pixel_replacement_5pct_seed1",
+    "pixel_replacement_5pct_seed2"
+  ],
+  "records": 4
+}

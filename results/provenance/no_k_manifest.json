@@ -1,0 +1,37 @@
+﻿{
+  "status": "complete",
+  "datasets_requested": [
+    "salinas_a",
+    "indian_pines",
+    "ksc",
+    "pavia_university",
+    "whu_hi_longkou",
+    "whu_hi_honghu",
+    "whu_hi_hanchuan",
+    "botswana",
+    "trento"
+  ],
+  "methods_requested": [
+    "hdbscan"
+  ],
+  "completed_requested_dataset_method_pairs": 9,
+  "expected_dataset_method_pairs": 9,
+  "all_completed_dataset_method_pairs_in_output": 18,
+  "per_run_records": 54,
+  "failures": [],
+  "protocol": {
+    "true_k_supplied": false,
+    "labels_used_for_fitting_or_selection": false,
+    "leiden_graph": "exact frozen weighted mutual-kNN graph: z-score bands, PCA-20 neighbour search, k=20, radius=7, min_degree=4, Gaussian spectral-spatial edge affinity",
+    "leiden_selector": "fixed resolution grid; cross-seed and adjacent-resolution ARI; largest cluster <= 0.40; normalized entropy >= 0.35",
+    "hdbscan": "sklearn.cluster.HDBSCAN defaults on StandardScaler + PCA-20; noise retained as label -1 and reported"
+  },
+  "environment": {
+    "python": "3.12.13 (main, Mar  4 2026, 09:23:07) [GCC 11.4.0]",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35",
+    "sklearn": "1.6.1",
+    "numpy": "2.0.2",
+    "igraph": "0.11.9",
+    "leidenalg": "unknown"
+  }
+}

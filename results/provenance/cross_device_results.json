@@ -1,0 +1,44 @@
+[
+  {
+    "dataset": "ksc",
+    "frozen_cpu_clusters": 720,
+    "new_gpu_clusters": 686,
+    "cluster_count_difference": -34,
+    "partition_ari_all_pixels": 0.9959895290873477,
+    "partition_ari_labelled_pixels": 0.9996366363597677,
+    "gpu_OA": 0.46363461907503356,
+    "gpu_BA": 0.3749312646853883,
+    "gpu_NMI": 0.6315225880924152,
+    "gpu_ARI": 0.32279367209523846,
+    "runtime_seconds": 21.834166843000276,
+    "peak_gpu_allocated_mb": 10517.508096
+  },
+  {
+    "dataset": "whu_hi_hanchuan",
+    "frozen_cpu_clusters": 83,
+    "new_gpu_clusters": 102,
+    "cluster_count_difference": 19,
+    "partition_ari_all_pixels": 0.911411926603761,
+    "partition_ari_labelled_pixels": 0.9577986433862566,
+    "gpu_OA": 0.5020541296159671,
+    "gpu_BA": 0.44662667309591936,
+    "gpu_NMI": 0.600852957601695,
+    "gpu_ARI": 0.628184180591261,
+    "runtime_seconds": 34.826109166000606,
+    "peak_gpu_allocated_mb": 12334.5536
+  },
+  {
+    "dataset": "botswana",
+    "frozen_cpu_clusters": 38,
+    "new_gpu_clusters": 43,
+    "cluster_count_difference": 5,
+    "partition_ari_all_pixels": 0.992110802519198,
+    "partition_ari_labelled_pixels": 0.9854098902191817,
+    "gpu_OA": 0.43103448275862066,
+    "gpu_BA": 0.4219147879047366,
+    "gpu_NMI": 0.7022843166099344,
+    "gpu_ARI": 0.3070647567325888,
+    "runtime_seconds": 23.059264604999953,
+    "peak_gpu_allocated_mb": 12638.769152
+  }
+]

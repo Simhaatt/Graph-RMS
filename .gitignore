@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Build and editor files
+build/
+dist/
+*.egg-info/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Raw hyperspectral data and local caches are not redistributed
+data/**/*.mat
+data/**/*.bsq
+data/**/*.hdr
+data/**/*.tif
+data/**/*.tiff
+data/.cache/
+
+# Generated run products; curated release CSV/JSON/NPY files remain tracked
+outputs/
+runs/
+checkpoints/
+*.log
+*.zip
+
+# LaTeX build products
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+

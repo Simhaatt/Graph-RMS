@@ -1,0 +1,22 @@
+{
+  "method": "Graph-RMS adaptive-v5",
+  "method_status": "frozen",
+  "ground_truth_used_for_method_selection": false,
+  "graph_rms_prior_class_count_required": false,
+  "baseline_prior_class_count": "True K supplied to matched external baselines",
+  "spectral_preprocessing": "Per-band z-score; PCA-20 used for graph-neighbour search",
+  "evaluation_metrics": [
+    "overall accuracy after Hungarian assignment",
+    "balanced accuracy after Hungarian assignment",
+    "normalized mutual information",
+    "adjusted Rand index"
+  ],
+  "random_seed_policy": {
+    "graph_rms": 0,
+    "classical_baselines": "five seeds",
+    "modern_baselines": "reported seeds and identity checks retained in the external baseline records"
+  },
+  "result_root": "/content/drive/MyDrive/graphrms_journal_response",
+  "checksum_records": 145,
+  "source_registry": "submission_package/data/frozen_results_registry.json"
+}

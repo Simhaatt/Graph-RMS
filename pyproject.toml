@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graph-rms"
+version = "1.0.0"
+description = "Training-free and class-count-free spectral-spatial region discovery for hyperspectral images"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Licence decision pending; see LICENSE"}
+authors = [
+  {name = "Simhaa T. T."},
+  {name = "Steven Yves Le Moan"},
+  {name = "Shihabudheen K. V.", email = "shihabudheen@nitc.ac.in"},
+]
+dependencies = [
+  "numpy==2.0.2",
+  "scipy==1.16.3",
+  "scikit-learn==1.6.1",
+  "torch==2.11.0",
+]
+
+[tool.setuptools]
+packages = ["graphrms"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

@@ -1,0 +1,38 @@
+protocol: automatic-v2
+status: locked_after_eight_scene_global_calibration
+development_scenes:
+  [salinas_a, indian_pines, ksc, pavia_university, whu_hi_longkou,
+   whu_hi_honghu, whu_hi_hanchuan, botswana]
+trento_role: retrospective_transfer_not_second_holdout
+
+candidate_grid:
+  checkpoints: [25, 50, 100, 200]
+  local_scale_neighbor_rank_q: 10
+  gamma: [0.75, 1.00, 1.25, 1.50]
+  fine_radius_definition: r_f = gamma * s_T
+  s_T_definition: median positive finite tenth non-self-neighbor distance in standardized diffusion-PCA space
+  tau: [0.00, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40,
+        0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 1.00, 1.50, 2.00, 3.00]
+  beta: [0.0, 0.5]
+
+global_calibration_grid:
+  adjacent_scale_stability: [0.80, 0.85, 0.90]
+  maximum_compression: [0.85, 0.90, 0.95]
+  beta_agreement: [0.50, 0.60, 0.70, 0.80, 0.90]
+
+locked_rule:
+  adjacent_scale_stability_minimum: 0.80
+  maximum_compression: 0.85
+  size_aware_beta_agreement_minimum: 0.90
+  minimum_adjacent_scale_support: 2
+  conservative_fallback_beta: 0.0
+  abstain_when_no_stable_component: true
+  hierarchy:
+    - reject_degenerate_candidates
+    - retain_stable_components_with_maximum_support
+    - break_component_ties_by_mean_stability
+    - choose_representative_by_stability_then_component_centrality_then_lower_compression
+    - retain_beta_0_5_only_for_greater_support_or_equal_support_with_0_01_higher_mean_stability
+    - otherwise_use_beta_0
+    - abstain_if_no_valid_component
+

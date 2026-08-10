@@ -1,0 +1,13 @@
+dataset,perturbation,kind,strength,seed,selector_status,selection_protocol,overall_accuracy,balanced_accuracy,nmi,ari
+salinas_a,noise_1pct_seed1,,,,frozen threshold,frozen original threshold,0.8068436798803291,0.7483883081425896,0.8667622107593416,0.7506447550316
+salinas_a,noise_1pct_seed2,,,,frozen threshold,frozen original threshold,0.806282722513089,0.7478695448259857,0.8668234567059903,0.7505839850615181
+salinas_a,pixel_replacement_5pct_seed1,,,,frozen threshold,frozen original threshold,0.8087135377711294,0.7492047340357034,0.8871019575446786,0.7718941020376036
+salinas_a,pixel_replacement_5pct_seed2,,,,frozen threshold,frozen original threshold,0.8109573672400897,0.7515579016416694,0.8784957985165605,0.7617071462629502
+indian_pines,noise_1pct_seed1,,,,frozen threshold,frozen original threshold,0.4187725631768953,0.5361016602406359,0.5899179064795562,0.2995569883876138
+indian_pines,noise_1pct_seed2,,,,frozen threshold,frozen original threshold,0.4429700458581325,0.5243879772206629,0.5864211346292689,0.3041688133643829
+indian_pines,pixel_replacement_5pct_seed1,,,,frozen threshold,frozen original threshold,0.3853058835008293,0.4820145381733428,0.5795189006618391,0.2542349630911971
+indian_pines,pixel_replacement_5pct_seed2,,,,frozen threshold,frozen original threshold,0.3249097472924188,0.4127271863213686,0.5107783059058704,0.1348683127488071
+pavia_university,noise_1pct_seed1,noise,0.01,1.0,selected,label-free threshold re-selection,0.6274546474658688,0.5213927246184485,0.6812541418640252,0.4933345753906311
+pavia_university,noise_1pct_seed2,noise,0.01,2.0,selected,label-free threshold re-selection,0.6390265569478212,0.5123196753492307,0.6873133266916619,0.5133467997967829
+pavia_university,pixel_replacement_5pct_seed1,pixel_replace,0.05,1.0,abstain,label-free threshold re-selection,0.4760145876192257,0.3097686167080423,0.494345389078513,0.239895368013859
+pavia_university,pixel_replacement_5pct_seed2,pixel_replace,0.05,2.0,abstain,label-free threshold re-selection,0.47227417243314,0.3097696380706948,0.4963775611480672,0.2371667821714048

@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-07-29T13:31:32.280827+00:00",
+  "python": "3.12.13 (main, Mar  4 2026, 09:23:07) [GCC 11.4.0]",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+  "processor": "x86_64",
+  "numpy": "2.0.2",
+  "torch": "2.11.0+cu128",
+  "cuda_available": true,
+  "torch_cuda_version": "12.8",
+  "gpu": "NVIDIA A100-SXM4-80GB, 580.82.07, 81920 MiB",
+  "colab_runtime": "release-colab-external-images_20260727-060049_RC00"
+}
