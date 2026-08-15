@@ -113,10 +113,44 @@ def main() -> int:
     }.items():
         if not close4(trento["evaluation_after_selection"][key], expected):
             failures.append(f"automatic Trento {key} mismatch")
+    v2_replay = json.loads(
+        (ROOT / "results/provenance/automatic_v2_archive_replay.json").read_text()
+    )
+    if v2_replay.get("status") != "PASS" or v2_replay.get("datasets_verified") != 9:
+        failures.append("automatic-v2 archive replay did not verify all nine scenes")
+    for record in v2_replay.get("records", []):
+        if record["dataset"] != "trento" and record["partition_ari_vs_archive"] != 1.0:
+            failures.append(f"automatic-v2 replay mismatch for {record['dataset']}")
+    calibration = json.loads(
+        (ROOT / "results/provenance/automatic_v2_calibration_replay/"
+         "development_calibration_replay.json").read_text()
+    )
+    expected_calibration = {
+        "stability_min": 0.8,
+        "compression_max": 0.85,
+        "beta_agreement_min": 0.9,
+        "coverage": 8,
+        "mean_OA": 0.574435460669256,
+        "mean_BA": 0.5383551066811946,
+        "mean_NMI": 0.7239183090352643,
+        "mean_ARI": 0.5813199444346115,
+    }
+    if calibration.get("status") != "PASS":
+        failures.append("automatic-v2 development calibration replay did not pass")
+    for key, expected in expected_calibration.items():
+        observed = calibration.get("best", {}).get(key)
+        if observed is None or not math.isclose(float(observed), expected, abs_tol=1e-12):
+            failures.append(
+                f"automatic-v2 calibration {key} mismatch: {observed} vs {expected}"
+            )
+    wrapper = (ROOT / "scripts/run_automatic_selector.py").read_text()
+    if "_run_automatic_v2.py" not in wrapper:
+        failures.append("public automatic-selector wrapper does not execute automatic-v2")
 
     figures = [
         "fig2_representative_cluster_maps.png", "fig3_fragmentation.png",
-        "fig4_sensitivity.png", "repeatability_and_perturbation_matched_style.png",
+        "fig4_sensitivity.png", "fig5_robustness_repeatability.png",
+        "repeatability_and_perturbation_matched_style.png",
         "fig6_runtime_memory.png",
     ]
     for filename in figures:
@@ -128,6 +162,8 @@ def main() -> int:
     if not (ROOT / "manuscript_support/references.bib").exists():
         message = "missing supplied bibliography: manuscript_support/references.bib"
         (failures if args.strict_manuscript_assets else warnings).append(message)
+    if not (ROOT / "main.tex").exists():
+        failures.append("missing root manuscript build entry point: main.tex")
 
     manuscript = (ROOT / "manuscript_support/manuscript_supplied.tex").read_text(errors="replace")
     if manuscript.count(r"\section*{Data availability statement}") != 1:

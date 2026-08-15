@@ -66,6 +66,9 @@ Automatic-v2 separates global calibration from deployment:
   distance in standardized diffusion-PCA space.
 - The full candidate grid and deterministic hierarchy are frozen in
   `configs/automatic_selector.yaml` and preserved in the development lock.
+- `scripts/run_automatic_selector.py` executes the recovered automatic-v2
+  component selector; `_run_automatic_selection.py` is retained only as the
+  automatic-scale-v1 endpoint-surface generator.
 - Seven development scenes selected the conservative branch; KSC selected the
   size-aware branch. No development scene abstained.
 - Trento was already known when automatic-v2 was designed. Its automatic
@@ -151,4 +154,3 @@ to 42.34 s, but preparation, downloads, environment setup, and repeated
 diagnostic grids add substantial wall time. Peak allocated GPU memory reaches
 14.9 GB on HongHu. CPU-only execution is supported but was not the hardware
 profile reported in the main runtime table.
-

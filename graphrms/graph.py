@@ -4,9 +4,8 @@ Candidate neighbours for pixel i are drawn from a local spatial window
 (so spatial context is baked into which edges can exist at all, not just
 into a soft weight), ranked by distance in a PCA-reduced spectral space.
 The MNN gate keeps an edge (i, j) only when each pixel is in the other's
-candidate list, which is exactly Eq. 1's M_ij term. The learned KAN
-affinity (kan.py/train.py) then decides how strong each surviving edge
-is; this module only decides which edges exist.
+candidate list. This module determines graph support; the fixed Gaussian
+spectral-spatial affinity then weights the surviving edges.
 """
 
 from __future__ import annotations

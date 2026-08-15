@@ -26,6 +26,7 @@ data/.cache/
 
 # Generated run products; curated release CSV/JSON/NPY files remain tracked
 outputs/
+output/
 runs/
 checkpoints/
 *.log
@@ -39,4 +40,3 @@ checkpoints/
 *.fls
 *.out
 *.synctex.gz
-

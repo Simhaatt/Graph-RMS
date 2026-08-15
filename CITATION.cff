@@ -2,10 +2,10 @@ cff-version: 1.2.0
 message: "If you use Graph-RMS or its supporting outputs, please cite this software and the associated manuscript."
 title: "Graph-RMS: reproducibility package for training-free and class-count-free spectral–spatial region discovery in hyperspectral remote-sensing images"
 type: software
-version: 1.0.0
-date-released: 2026-08-10
+version: 1.0.1
+date-released: 2026-08-15
 license: MIT
-doi: "10.5281/zenodo.21876448"
+doi: "10.5281/zenodo.21876447"
 repository-code: "https://github.com/Simhaatt/Graph-RMS"
 authors:
   - family-names: "T. T."

@@ -1,17 +1,8 @@
-"""Fixed, hand-picked Gaussian-kernel affinity -- the paper's original Eq. 1
-(A_ij = M_ij * S_ij * P_ij with S/P Gaussian kernels) as a non-learned
-alternative to the KAN affinity in kan.py/train.py.
+"""Fixed Gaussian spectral-spatial affinity used by Graph-RMS.
 
-No training step: this is a direct function of the graph's edge features.
-Exists for two reasons: (1) a fast, always-available baseline when the KAN
-affinity needs more tuning than time allows, (2) the ablation comparison a
-paper needs anyway -- Graph-RMS+Gaussian vs. Graph-RMS+KAN -- to show the
-learned affinity is actually earning its complexity rather than just being
-different.
-
-Kernel widths (sigma) are picked via the median heuristic (the standard,
-principled way to set a Gaussian kernel width from data instead of guessing
-a constant) unless overridden.
+The affinity is a deterministic function of supported-edge spectral and
+spatial distances. Kernel widths are estimated with a seeded median heuristic
+over at most 50,000 stored supported edges and are floored at ``1e-6``.
 """
 
 from __future__ import annotations
@@ -31,9 +22,7 @@ def median_heuristic_sigmas(spectra: np.ndarray, edge_i: np.ndarray, edge_j: np.
                              spatial_dist: np.ndarray, sample_size: int = 50_000,
                              seed: int = 0) -> tuple[float, float]:
     """Median pairwise distance over a sample of candidate edges -- the
-    standard, data-driven way to pick a Gaussian kernel width. Shared by the
-    fixed-Gaussian and learned-metric affinities so both use identical widths
-    (only the per-band weighting differs), keeping the ablation apples-to-apples."""
+    standard, data-driven way to pick a Gaussian kernel width."""
     e = edge_i.shape[0]
     rng = np.random.default_rng(seed)
     sample = rng.choice(e, size=min(sample_size, e), replace=False)

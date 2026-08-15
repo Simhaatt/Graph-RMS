@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "graph-rms"
-version = "1.0.0"
+version = "1.0.1"
 description = "Training-free and class-count-free spectral-spatial region discovery for hyperspectral images"
 readme = "README.md"
 requires-python = ">=3.12"
-license = {text = "Licence decision pending; see LICENSE"}
+license = "MIT"
 authors = [
   {name = "Simhaa T. T."},
   {name = "Steven Yves Le Moan"},
@@ -26,4 +26,3 @@ packages = ["graphrms"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-

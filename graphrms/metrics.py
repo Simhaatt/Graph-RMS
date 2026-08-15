@@ -1,7 +1,8 @@
-"""Unsupervised clustering evaluated against ground truth via Hungarian
-matching -- the method never sees labels during training/clustering, but
-WHU-Hi-HongHu ships dense ground truth so this is the only way to confirm
-the pipeline actually separates land-cover classes rather than just running.
+"""Reference-based evaluation for unsupervised full-scene partitions.
+
+Reference labels are masked and used only after selection. OA and BA use a
+one-to-one predicted-region-to-reference-class Hungarian assignment; unmatched
+predicted regions remain errors. NMI and ARI operate directly on region labels.
 """
 
 from __future__ import annotations

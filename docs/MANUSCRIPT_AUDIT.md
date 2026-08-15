@@ -1,6 +1,6 @@
 # Manuscript and artifact audit
 
-Audit date: 10 August 2026  
+Audit date: 15 August 2026
 Supplied manuscript: `manuscript_support/manuscript_supplied.tex`  
 Target named by the authors: *GIScience & Remote Sensing*
 
@@ -30,7 +30,7 @@ was regenerated or altered while assembling this repository.
 
 - The author-supplied `figures/graph.pdf` is present as a one-page vector PDF
   with embedded Arial fonts; `figures/graph.png` remains available as a preview.
-- The author-supplied bibliography contains 35 unique entries. All 33 citation
+- The author-supplied bibliography contains 37 unique entries. All 35 citation
   keys used by `manuscript_supplied.tex` are present; no duplicate keys or
   unbalanced braces were detected.
 

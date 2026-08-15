@@ -1,8 +1,9 @@
-"""Auditable, label-free automatic scale selection for Graph-RMS.
+"""Archived automatic-scale-v1 candidate generation for Graph-RMS.
 
-Selection loads only the hyperspectral cube. Reference labels are loaded by a
-separate ``evaluate`` command after the selected partition and its SHA-256 lock
-have been written. Trento additionally requires a frozen development protocol.
+This implementation generates the label-free endpoint surfaces consumed by
+automatic-v2. Its historical v1 endpoint decision is retained for provenance
+and backward compatibility but is not the reported automatic-v2 selector.
+Reference labels are loaded only by the separate ``evaluate`` command.
 """
 from __future__ import annotations
 

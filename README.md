@@ -1,6 +1,6 @@
 # Graph-RMS
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21876448.svg)](https://doi.org/10.5281/zenodo.21876448)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21876447.svg)](https://doi.org/10.5281/zenodo.21876447)
 
 Reproducibility package for **Graph-RMS: Training-Free and Class-Count-Free
 Spectral-Spatial Region Discovery in Hyperspectral Remote-Sensing Images**.
@@ -162,7 +162,8 @@ valid vector PDF with embedded fonts.
 
 Citation metadata are provided in `CITATION.cff` and `.zenodo.json` for
 `https://github.com/Simhaatt/Graph-RMS`. The software is released under the MIT
-License. The exact `v1.0.0` reproducibility archive is available at
-`https://doi.org/10.5281/zenodo.21876448`; the all-versions concept DOI is
-`https://doi.org/10.5281/zenodo.21876447`. See
+License. Release `v1.0.1` is the current corrective reproducibility release;
+the stable all-versions concept DOI is
+`https://doi.org/10.5281/zenodo.21876447`. Release `v1.0.0` remains preserved at
+`https://doi.org/10.5281/zenodo.21876448`. See
 [docs/RELEASE.md](docs/RELEASE.md).

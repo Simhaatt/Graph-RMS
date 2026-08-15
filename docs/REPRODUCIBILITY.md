@@ -70,6 +70,10 @@ HDBSCAN and Leiden can be substantially slower than Graph-RMS.
 
 The automatic selector deliberately separates label-free selection from
 reference evaluation. Do not combine these steps in a single custom script.
+The public wrapper executes the recovered automatic-v2 implementation. It
+first generates the archived automatic-scale-v1 endpoint surface without
+labels, ignores the v1 endpoint decision, and applies the cryptographically
+locked v2 component rule.
 
 ```bash
 python scripts/run_automatic_selector.py select \
@@ -77,6 +81,17 @@ python scripts/run_automatic_selector.py select \
 
 python scripts/run_automatic_selector.py evaluate \
   --dataset salinas_a --data-dir data --output-root outputs/automatic
+```
+
+The exact implementation was replayed against all nine retained endpoint
+surfaces. It reproduced all eight development partitions with ARI 1.0 and the
+complete Trento selected metadata. With separately generated endpoint caches,
+the archival check can be repeated using:
+
+```bash
+python scripts/run_automatic_selector.py verify-archive \
+  --candidate-root /path/to/automatic-scale-v1-caches \
+  --report outputs/automatic_v2_archive_replay.json
 ```
 
 Development locks must be completed before freezing a new protocol. The

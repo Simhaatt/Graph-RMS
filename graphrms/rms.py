@@ -1,16 +1,11 @@
-"""Graph-RMS: mean-shift-style mode seeking run on the learned graph (Eq. 2),
-followed by mode merging into final cluster labels.
+"""Graph-RMS finite graph-diffusion update.
 
-The graph itself never changes during iteration -- only the pixel
-"positions" y do, moving toward a weighted average of their graph
-neighbours each step. Because the candidate graph is spatially local
-(graph.py windows candidates), the whole image is typically one connected
-component, so clusters only emerge from where different pixels' positions
-converge to the *same* point in spectral space, not from graph
-connectivity -- hence the distance-based merge step at the end.
-
-Iteration runs on torch (CPU or CUDA) via sparse matmul so the same code
-scales from a laptop smoke test up to a full 446k-pixel scene on an A100.
+The reported Graph-RMS procedure is inspired by repeated local weighted-mean
+updates used in mean-shift mode seeking, but it is not mathematically
+equivalent to conventional mean shift. The graph support and transition
+weights are fixed before the reported damped diffusion, and the representation
+is retained at a finite checkpoint before fine-mode formation and prototype
+consolidation.
 """
 
 from __future__ import annotations

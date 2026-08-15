@@ -7,7 +7,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "outputs"}
+EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "output", "outputs"}
 EXCLUDED_SUFFIXES = {".pyc", ".log", ".aux", ".out", ".zip"}
 
 
@@ -26,7 +26,7 @@ def sha256(path: Path) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT.parent / "Graph-RMS-v1.0.0.zip")
+    parser.add_argument("--output", type=Path, default=ROOT.parent / "Graph-RMS-v1.0.1.zip")
     args = parser.parse_args()
     with zipfile.ZipFile(args.output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in sorted(ROOT.rglob("*")):
@@ -40,4 +40,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

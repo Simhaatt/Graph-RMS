@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "protocol": "automatic-v2-global-calibration",
+  "calibration_uses_development_labels": true,
+  "target_scene_selection_uses_labels": false,
+  "development_rule_sha256": "87f894b50b18edd5d1ee31d5b1b856b2a27752beb0416206523bcfc9db67bb59",
+  "best": {
+    "stability_min": 0.8,
+    "compression_max": 0.85,
+    "beta_agreement_min": 0.9,
+    "coverage": 8,
+    "mean_OA": 0.574435460669256,
+    "mean_BA": 0.5383551066811946,
+    "mean_NMI": 0.7239183090352643,
+    "mean_ARI": 0.5813199444346115,
+    "structural_score": 0.6526191267349379
+  },
+  "expected": {
+    "stability_min": 0.8,
+    "compression_max": 0.85,
+    "beta_agreement_min": 0.9,
+    "coverage": 8,
+    "mean_OA": 0.574435460669256,
+    "mean_BA": 0.5383551066811946,
+    "mean_NMI": 0.7239183090352643,
+    "mean_ARI": 0.5813199444346115
+  },
+  "candidate_cache_source": "externally regenerated label-free endpoint caches",
+  "rule_search_table": "development_rule_search.csv"
+}

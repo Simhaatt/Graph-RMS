@@ -12,6 +12,7 @@ FIGURES = [
     "fig2_representative_cluster_maps.png",
     "fig3_fragmentation.png",
     "fig4_sensitivity.png",
+    "fig5_robustness_repeatability.png",
     "repeatability_and_perturbation_matched_style.png",
     "fig6_runtime_memory.png",
 ]

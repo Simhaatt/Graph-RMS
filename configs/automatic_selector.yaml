@@ -16,7 +16,7 @@ candidate_grid:
   beta: [0.0, 0.5]
 
 global_calibration_grid:
-  adjacent_scale_stability: [0.80, 0.85, 0.90]
+  adjacent_scale_stability: [0.80, 0.825, 0.85, 0.875, 0.90]
   maximum_compression: [0.85, 0.90, 0.95]
   beta_agreement: [0.50, 0.60, 0.70, 0.80, 0.90]
 
@@ -35,4 +35,3 @@ locked_rule:
     - retain_beta_0_5_only_for_greater_support_or_equal_support_with_0_01_higher_mean_stability
     - otherwise_use_beta_0
     - abstain_if_no_valid_component
-
