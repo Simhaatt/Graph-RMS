@@ -163,6 +163,7 @@ valid vector PDF with embedded fonts.
 Citation metadata are provided in `CITATION.cff` and `.zenodo.json` for
 `https://github.com/Simhaatt/Graph-RMS`. The software is released under the MIT
 License. Release `v1.0.1` is the current corrective reproducibility release;
+its version-specific DOI is `https://doi.org/10.5281/zenodo.21944560`, and
 the stable all-versions concept DOI is
 `https://doi.org/10.5281/zenodo.21876447`. Release `v1.0.0` remains preserved at
 `https://doi.org/10.5281/zenodo.21876448`. See
