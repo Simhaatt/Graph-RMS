@@ -5,7 +5,14 @@ type: software
 version: 1.0.1
 date-released: 2026-08-15
 license: MIT
-doi: "10.5281/zenodo.21944560"
+doi: "10.5281/zenodo.21876447"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21876447"
+    description: "Concept DOI (all versions)"
+  - type: doi
+    value: "10.5281/zenodo.21944560"
+    description: "Version DOI for release v1.0.1"
 repository-code: "https://github.com/Simhaatt/Graph-RMS"
 authors:
   - family-names: "T. T."
