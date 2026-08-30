@@ -4,7 +4,7 @@ title: "Graph-RMS: reproducibility package for training-free and class-count-fre
 type: software
 version: 1.0.1
 date-released: 2026-08-15
-license: MIT
+license: CC-BY-4.0
 doi: "10.5281/zenodo.21876447"
 identifiers:
   - type: doi
