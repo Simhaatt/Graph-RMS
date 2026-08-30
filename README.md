@@ -162,8 +162,12 @@ valid vector PDF with embedded fonts.
 ## Citation, licence, and archival status
 
 Citation metadata are provided in `CITATION.cff` and `.zenodo.json` for
-`https://github.com/Simhaatt/Graph-RMS`. The software is released under the MIT
-License. Release `v1.0.1` is the current corrective reproducibility release;
+`https://github.com/Simhaatt/Graph-RMS`. This package — source code,
+documentation, configurations, curated result tables, and figure assets — is
+released under the Creative Commons Attribution 4.0 International licence
+(CC BY 4.0). Third-party hyperspectral datasets are not redistributed and
+remain under their original providers' terms.
+Release `v1.0.1` is the current corrective reproducibility release;
 its version-specific DOI is `https://doi.org/10.5281/zenodo.21944560`, and
 the stable all-versions concept DOI is
 `https://doi.org/10.5281/zenodo.21876447`. Release `v1.0.0` remains preserved at
