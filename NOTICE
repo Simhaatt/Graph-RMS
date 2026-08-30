@@ -1,0 +1,23 @@
+Graph-RMS — attribution and scope of the licence
+=================================================
+
+Copyright (c) 2026 Simhaa T. T., Steven Yves Le Moan, and Shihabudheen K. V.
+
+This package — source code, documentation, configurations, curated result
+tables, and figure assets in this repository — is licensed under the Creative
+Commons Attribution 4.0 International License (CC BY 4.0). The full licence
+text is in LICENSE; a summary is at
+https://creativecommons.org/licenses/by/4.0/
+
+Third-party hyperspectral datasets are NOT redistributed in this repository and
+are NOT covered by the grant above. They remain under their original providers'
+terms; see data/README.md and docs/DATASETS.md for acquisition instructions and
+the applicable terms.
+
+When reusing this material, please attribute it using the metadata in
+CITATION.cff, and cite the archived record:
+
+  T. T., S., Le Moan, S. Y., & K. V., S. (2026). Graph-RMS: reproducibility
+  package for training-free and class-count-free spectral–spatial region
+  discovery in hyperspectral remote-sensing images. Zenodo.
+  https://doi.org/10.5281/zenodo.21876447
