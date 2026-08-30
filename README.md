@@ -1,6 +1,7 @@
 # Graph-RMS
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21876447.svg)](https://doi.org/10.5281/zenodo.21876447)
+[![rebuild-analysis](https://github.com/Simhaatt/Graph-RMS/actions/workflows/rebuild-analysis.yml/badge.svg)](https://github.com/Simhaatt/Graph-RMS/actions/workflows/rebuild-analysis.yml)
 
 Reproducibility package for **Graph-RMS: Training-Free and Class-Count-Free
 Spectral-Spatial Region Discovery in Hyperspectral Remote-Sensing Images**.
