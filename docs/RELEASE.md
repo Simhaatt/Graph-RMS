@@ -14,9 +14,10 @@ Official references:
 
 ## 1. Resolve blockers before creating a public repository
 
-- [x] Authors approve the MIT License for code.
-- [ ] Authors decide whether original documentation/results use CC BY 4.0.
-- [x] Replace the no-grant `LICENSE` placeholder with approved MIT text.
+- [x] Authors approve the CC BY 4.0 licence for the package.
+- [x] Authors decided that the code, documentation, and results are all
+      released under CC BY 4.0.
+- [x] Replace the `LICENSE` file with the approved CC BY 4.0 text.
 - [x] Add the approved SPDX licence identifier to `CITATION.cff` and
       `.zenodo.json`.
 - [x] Preserve the publication-ready `figures/graph.pdf` workflow figure and PNG preview.
