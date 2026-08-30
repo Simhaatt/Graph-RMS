@@ -34,10 +34,11 @@ Dataset identifiers are stable across configs, results, and scripts.
 
 The package includes frozen settings, source implementations, per-scene
 partitions, raw diagnostic rows, environment capture, checksums, automated
-audits, and explicit limitations. The authors approved the MIT License for the
-software. Third-party datasets remain under their original provider terms and
-are not redistributed. No separate Creative Commons grant is asserted for
-third-party materials.
+audits, and explicit limitations. The authors approved the Creative Commons
+Attribution 4.0 International licence (CC BY 4.0) for this package, covering
+the software, documentation, and curated results. Third-party datasets remain
+under their original provider terms, are not redistributed, and are not
+covered by that grant.
 
 ## Remaining manual FAIR tasks
 
