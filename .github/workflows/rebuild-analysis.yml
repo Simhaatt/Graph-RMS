@@ -1,0 +1,63 @@
+name: rebuild-analysis
+
+# Level-2 rebuild: regenerate the manuscript tables and figures from the curated
+# CSVs, then check they still match what is committed. No raw cubes, no GPU.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 3 1 * *"   # monthly, so bit-rot surfaces before a reviewer finds it
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Rebuild tables
+        run: python scripts/export_tables.py
+
+      - name: Rebuild figures
+        run: python scripts/generate_figures.py
+
+      - name: Fail if regenerated outputs drift from committed ones
+        run: |
+          git diff --stat -- results/ figures/
+          if ! git diff --quiet -- results/ figures/; then
+            echo "::error::Regenerated results/figures differ from the committed artifacts."
+            git diff -- results/ | head -200
+            exit 1
+          fi
+          echo "Regenerated outputs match the committed artifacts."
+
+      - name: Test suite (if present)
+        run: |
+          if [ -d tests ]; then
+            python -m pip install pytest
+            pytest -q
+          else
+            echo "No tests/ directory; skipping."
+          fi
+
+      - name: Upload rebuilt artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rebuilt-analysis
+          path: |
+            results/
+            figures/
+          if-no-files-found: warn
